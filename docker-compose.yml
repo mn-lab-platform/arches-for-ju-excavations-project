@@ -104,6 +104,7 @@ services:
       - arches-static:/static_root
       - arches-app:/arches_app
       - ../arches_data/:/arches_data
+      - ./${ARCHES_PROJECT}:/arches_app/${ARCHES_PROJECT}      
     logging:
       driver: "json-file"
       options:
