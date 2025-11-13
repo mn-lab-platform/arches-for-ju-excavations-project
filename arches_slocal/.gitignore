@@ -7,3 +7,4 @@ coverage/
 .DS_STORE
 CACHE
 afs_plocal/media/build/
+arches_slocal/media/build/js   
