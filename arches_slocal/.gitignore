@@ -9,7 +9,6 @@ arches_slocal/staticfiles
 arches_slocal/media/packages
 arches_slocal/media/build/
 arches_slocal/uploadedfiles/*
-arches_slocal/settings_local.py
 webpack-stats.json
 .vscode/
 *.egg-info
