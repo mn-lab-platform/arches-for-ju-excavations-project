@@ -16,3 +16,5 @@ docker exec arches find / -name "bhutan_tigersnest_lr.jpg"
 docker exec -it arches python manage.py fn register --source ./afs_plocal/functions/rti_function.py
 
 docker exec -it arches python manage.py changepassword admin
+
+docker cp C:\Users\filo1\Desktop\praca\cesium_sandbox\legit\sandbox\public\georeferenced arches:/arches_app/arches_slocal/arches_slocal/uploadedfiles/
