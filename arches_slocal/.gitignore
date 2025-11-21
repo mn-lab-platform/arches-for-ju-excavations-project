@@ -6,4 +6,4 @@ coverage/
 *.egg-info
 .DS_STORE
 CACHE
-arches_slocal/media/build/js/
+arches_slocal/media/build/

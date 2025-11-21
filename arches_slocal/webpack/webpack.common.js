@@ -350,6 +350,9 @@ module.exports = () => {
                 new webpack.DefinePlugin({
                     CESIUM_BASE_URL: JSON.stringify(STATIC_URL + cesiumOutputPath + '/') 
                 }),
+                new webpack.DefinePlugin({ 
+                    'process.env.CESIUM_ION_TOKEN': JSON.stringify(process.env.CESIUM_ION_TOKEN)
+                }),
             ],
             resolve: {
                 modules: [Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH)],
