@@ -19,7 +19,7 @@
     A custom component's code parts should be placed and named as following:
     1. JavaScript source code -> `arches_slocal\arches_slocal\media\js\my_component` (folder name in **camel case**).
     2. JavaSript entry point file, with component registration logic -> `arches_slocal\arches_slocal\media\js\views\components\custom\my-component.js` (file name in **kebab case**).
-    3. CSS file/s -> `arches_slocal\arches_slocal\media\css\my_component` (folder name in **camel case**), and referenced inside **entry point file**. In case you only define one css file, you should use the name **index.css**.
+    3. CSS file/s -> `arches_slocal\arches_slocal\media\css\components\my_component` (folder name in **camel case**), and referenced inside **entry point file**. In case you only define one css file, you should use the name **index.css**.
     4. Html template -> `arches_slocal\arches_slocal\templates\views\components\custom\my_viewer.htm` (file name in **camel case**).
 
 
