@@ -9,7 +9,7 @@
         - `arches_slocal\arches_slocal\reports\my-report.json` -> **kebab case**
         - `arches_slocal\arches_slocal\templates\views\report-templates\my_report` -> **camel case**
 
-        We also currently decided to implement a walkaround allowing to add custom tabs and logic to tabbed-report, located at:                 `arches_slocal\arches_slocal\media\js\viewmodels\mixins\tab-report-setup.js`
+        We also currently decided to implement a walkaround allowing to add custom tabs and logic to tabbed-report, located at:`arches_slocal\arches_slocal\media\js\viewmodels\mixins\tab-report-setup.js`
         for reference usage of **setupTabbedReport** checkout `arches_slocal\arches_slocal\media\js\reports\resource-3d-report.js`
 
     2. 
