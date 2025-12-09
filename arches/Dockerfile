@@ -43,6 +43,13 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# VIPS so big tiff can work
+RUN apt-get -y update 
+RUN apt-get -y upgrade
+RUN apt-get -y install libvips42 
+RUN apt-get -y install libvips-tools libvips-doc
+RUN apt-get clean
+
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -162,7 +169,9 @@ RUN pip install supervisor \
     && pip install tzdata --upgrade \
     && pip install Redis \
     && pip install gunicorn \
-    && pip install arches==8.0
+    && pip install arches==8.0 \
+    && pip install rasterio \
+    && pip install pyvips
 
 # create a new Arches project
 RUN mkdir -p /new_arches_proj
