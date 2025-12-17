@@ -32,10 +32,11 @@ PGPORT=5432
 ESHOST=arches_elasticsearch
 ESPORT=9200
 DJANGO_MODE=DEV
-DJANGO_DEBUG=True
+DJANGO_DEBUG=False
 # Don't change the port, since it's pretty hard-coded.
 DJANGO_PORT=8000
-DOMAIN_NAMES=localhost 0.0.0.0 127.0.0.1
+DEPLOY_HOST=tap.mn.cenagis.edu.pl
+DOMAIN_NAMES=tap.mn.cenagis.edu.pl localhost 127.0.0.1
 # NOTE: Only set BUILD_PRODUCTION=True if you have well over
 # 8GB of system RAM. Otherwise, yarn will likely error out.
 BUILD_PRODUCTION=False
