@@ -20,17 +20,18 @@
         "vitest": "vitest --run --coverage"
     },
     "dependencies": {
-        "arches": "archesproject/arches#stable/8.0.0"
+        "arches": "archesproject/arches#stable/8.0.0",
+        "cesium": "^1.135.0"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#stable/8.0.0"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#stable/8.0.0",
+        "copy-webpack-plugin": "^13.0.1"
     },
-    "nodeModulesPaths": {
-    },
+    "nodeModulesPaths": {},
     "overrides": {
         "moment-timezone": "^0.5.45",
         "nomnom": "npm:@gerhobbelt/nomnom",
-        "rimraf": "^5.0.7", 
+        "rimraf": "^5.0.7",
         "underscore": "^1.13.6"
     }
 }

@@ -5,6 +5,7 @@ const Path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleTracker = require('webpack-bundle-tracker');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { VueLoaderPlugin } = require("vue-loader");
@@ -41,6 +42,9 @@ module.exports = () => {
 
         // END workaround for handling node_modules paths in arches-core vs projects
         // BEGIN create entry point configurations
+
+        const cesiumSource = Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'cesium', 'Build', 'Cesium');
+        const cesiumOutputPath = 'cesium';
 
         const archesCoreEntryPointConfiguration = buildFilepathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'js'));
         const projectEntryPointConfiguration = buildFilepathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'js'));
@@ -256,8 +260,6 @@ module.exports = () => {
             }
         }
 
-        // END create universal constants
-
         resolve({
             entry: {
                 ...entryPoints,
@@ -311,6 +313,7 @@ module.exports = () => {
                         true  // should be re-evaluated on rebuild
                     ),
                 }),
+
                 new webpack.DefinePlugin({
                     __VUE_OPTIONS_API__: 'true',
                     __VUE_PROD_DEVTOOLS__: 'false',
@@ -336,6 +339,20 @@ module.exports = () => {
                     filename: 'webpack-stats.json',
                 }),
                 new VueLoaderPlugin(),
+                new CopyWebpackPlugin({
+                    patterns: [
+                        { from: Path.join(cesiumSource, 'Workers'), to: Path.join(cesiumOutputPath, 'Workers') },
+                        { from: Path.join(cesiumSource, 'ThirdParty'), to: Path.join(cesiumOutputPath, 'ThirdParty') },
+                        { from: Path.join(cesiumSource, 'Assets'), to: Path.join(cesiumOutputPath, 'Assets') },
+                        { from: Path.join(cesiumSource, 'Widgets'), to: Path.join(cesiumOutputPath, 'Widgets') },
+                    ],
+                }),
+                new webpack.DefinePlugin({
+                    CESIUM_BASE_URL: JSON.stringify(STATIC_URL + cesiumOutputPath + '/') 
+                }),
+                new webpack.DefinePlugin({ 
+                    'process.env.CESIUM_ION_TOKEN': JSON.stringify(process.env.CESIUM_ION_TOKEN)
+                }),
             ],
             resolve: {
                 modules: [Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH)],
@@ -346,11 +363,16 @@ module.exports = () => {
                     ...nodeModulesAliases,
                     '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')],
                     'node_modules': Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH),
+                    
+                    // Add Cesium-specific jQuery resolution
+                    '/arches_app/arches_slocal/node_modules/jquery/dist/jquery.min': Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'jquery', 'dist', 'jquery.min.js'),
+                    
                     'arches/arches/app': Path.resolve(__dirname, ROOT_DIR, 'app'),  // ensure project-level imports of arches components point to local file
+
                     ...Object.fromEntries(ARCHES_APPLICATIONS.map(app => [  // ensure project-level imports of arches application components point to local file
                         Path.join(app, app), Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[app])
                     ])),
-                },
+                }
             },
             module: {
                 rules: [
