@@ -87,7 +87,7 @@ backlog = get_optional_env_variable("GUNICORN_BACKLOG") or 2048
 workers = get_optional_env_variable("GUNICORN_WORKERS") or 2
 worker_class = get_optional_env_variable("GUNICORN_WORKER_CLASS") or "sync"
 worker_connections = get_optional_env_variable("GUNICORN_WORKER_CONNECTIONS") or 1000
-timeout = get_optional_env_variable("GUNICORN_WORKER_TIMEOUT") or 30
+timeout = get_optional_env_variable("GUNICORN_WORKER_TIMEOUT") or 300
 keepalive = get_optional_env_variable("GUNICORN_KEEPALIVE") or 2
 
 #
