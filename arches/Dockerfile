@@ -169,7 +169,7 @@ RUN pip install supervisor \
     && pip install tzdata --upgrade \
     && pip install Redis \
     && pip install gunicorn \
-    && pip install arches==8.0 \
+    && pip install arches==8.0.3 \
     && pip install rasterio \
     && pip install pyvips
 
