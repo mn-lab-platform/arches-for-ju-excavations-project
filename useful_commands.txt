@@ -18,3 +18,5 @@ docker exec -it arches python manage.py fn register --source ./arches_slocal/fun
 docker exec -it arches python manage.py changepassword admin
 
 docker cp C:\Users\filo1\Desktop\praca\cesium_sandbox\legit\sandbox\public\georeferenced arches:/arches_app/arches_slocal/arches_slocal/uploadedfiles/
+
+docker exec -it arches python manage.py shell -c "from arches.app.models.models import ReportTemplate; reports = ReportTemplate.objects.all(); print('\n=== Registered Reports ==='); [print(f'Template ID: {report.templateid}\nName: {report.name}\nComponent: {report.component}\n' + '-'*50) for report in reports]; print(f'\nTotal reports: {reports.count()}')"
