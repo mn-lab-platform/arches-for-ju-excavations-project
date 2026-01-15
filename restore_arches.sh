@@ -88,9 +88,14 @@ docker exec -e PGPASSWORD="${DB_PASSWORD}" "${DB_CONTAINER}" bash -lc \
 echo "[4/5] Cleanup temp dir"
 ${SUDO} rm -rf "${TMP_DIR}"
 
-echo "[5/5] Reindex Elasticsearch (Arches)"
-# Avoid -it (TTY) to prevent Git Bash issues; run non-interactive
+echo "[4/5] Reindex Elasticsearch (Arches)"
 docker exec "${ARCHES_CONTAINER}" bash -lc "python manage.py es reindex_database"
+
+echo "[5/5] 🔧 Fixing IIIF domains (manifests + iiif_url tiles)"
+docker cp fix_domains_full.py "${ARCHES_CONTAINER}:/tmp/fix_domains_full.py"
+docker exec "${ARCHES_CONTAINER}" bash -lc \
+'python "/tmp/fix_domains_full.py" "https://tap.mn.cenagis.edu.pl" "http://localhost:8000"'
+docker exec "${ARCHES_CONTAINER}" rm /tmp/fix_domains_full.py
 
 echo "DONE."
 echo "Restored:"

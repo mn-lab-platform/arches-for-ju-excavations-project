@@ -17,7 +17,7 @@ mkdir -p "${BACKUP_DIR}"
 
 echo "[1/2]🧠 DB dump -> ${BACKUP_DIR}/${DB_NAME}_${TS}.dump"
 sudo docker exec -e PGPASSWORD="${DB_PASSWORD}" "${DB_CONTAINER}" \
-  pg_dump -U "${DB_USER}" -F c -b -Z 6 "${DB_NAME}" \
+  pg_dump -U "${DB_USER}" -F c -b -Z 6 "${DB_NAME}" \``
   > "${BACKUP_DIR}/${DB_NAME}_${TS}.dump"
 
 echo "[2/2] 🧠Uploaded files volume -> ${BACKUP_DIR}/uploadedfiles_${TS}.tar.gz"
