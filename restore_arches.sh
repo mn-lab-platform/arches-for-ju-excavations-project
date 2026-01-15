@@ -16,13 +16,18 @@ ARCHES_CONTAINER="arches"
 CANTALOUPE_CONTAINER="cantaloupe_arches_slocal"
 # -----------------
 
-if [[ $# -ne 1 ]]; then
-  echo "Usage: $0 <TIMESTAMP>"
+if [[ $# -ne 1 && $# -ne 3 ]]; then
+  echo "Usage: $0 <TIMESTAMP> [OLD_DOMAIN NEW_DOMAIN]"
   echo "Example: $0 2026-01-12_1354"
+  echo "Example: $0 2026-01-12_1354 https://tap.mn.cenagis.edu.pl http://dev.mn.cenagis.edu.pl"
   exit 1
 fi
 
 TS="$1"
+DOMAIN_FROM_DEFAULT="https://tap.mn.cenagis.edu.pl"
+DOMAIN_TO_DEFAULT="http://dev.mn.cenagis.edu.pl"
+DOMAIN_FROM="${2:-$DOMAIN_FROM_DEFAULT}"
+DOMAIN_TO="${3:-$DOMAIN_TO_DEFAULT}"
 DB_DUMP="${BACKUP_DIR}/${DB_NAME}_${TS}.dump"
 UPLOADS_TAR="${BACKUP_DIR}/uploadedfiles_${TS}.tar.gz"
 TMP_DIR="${BACKUP_DIR}/_restore_tmp_uploadedfiles_${TS}"
@@ -94,7 +99,7 @@ docker exec "${ARCHES_CONTAINER}" bash -lc "python manage.py es reindex_database
 echo "[5/5] 🔧 Fixing IIIF domains (manifests + iiif_url tiles)"
 docker cp fix_domains_full.py "${ARCHES_CONTAINER}:/tmp/fix_domains_full.py"
 docker exec "${ARCHES_CONTAINER}" bash -lc \
-'python "/tmp/fix_domains_full.py" "https://tap.mn.cenagis.edu.pl" "http://localhost:8000"'
+"python \"/tmp/fix_domains_full.py\" \"${DOMAIN_FROM}\" \"${DOMAIN_TO}\""
 docker exec "${ARCHES_CONTAINER}" rm /tmp/fix_domains_full.py
 
 echo "DONE."
