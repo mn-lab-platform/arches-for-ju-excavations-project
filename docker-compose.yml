@@ -132,6 +132,14 @@ services:
     networks:
       - arches_slocal_net
 
+  titiler:
+    image: ghcr.io/developmentseed/titiler:latest
+    command: uvicorn titiler.application.main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - uploads:/data
+    networks:
+      - arches_slocal_net
+
 networks:
   arches_slocal_net:
     driver: bridge
