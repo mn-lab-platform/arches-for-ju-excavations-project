@@ -133,12 +133,18 @@ services:
       - arches_slocal_net
 
   titiler:
-    image: ghcr.io/developmentseed/titiler:latest
-    command: uvicorn titiler.application.main:app --host 0.0.0.0 --port 8000
+    build:
+      context: .
+      dockerfile: titiler/Dockerfile
+    image: titiler-iiif:latest
+    ports:
+      - "8081:8000"
     volumes:
-      - uploads:/data
+      - uploads:/data:ro
     networks:
       - arches_slocal_net
+    environment:
+      - TITILER_ALLOW_LOCAL=true
 
 networks:
   arches_slocal_net:
