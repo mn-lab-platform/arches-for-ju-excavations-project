@@ -171,6 +171,7 @@ RUN pip install supervisor \
     && pip install gunicorn \
     && pip install arches==8.0.3 \
     && pip install rasterio \
+    && pip install pyproj==3.7.2 \
     && pip install pyvips
 
 # create a new Arches project
