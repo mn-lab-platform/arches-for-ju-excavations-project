@@ -25,6 +25,6 @@ sudo docker cp cantaloupe_arches_slocal:/imageroot/uploadedfiles "${BACKUP_DIR}/
 sudo tar -czf "${BACKUP_DIR}/uploadedfiles_${TS}.tar.gz" -C "${BACKUP_DIR}/uploadedfiles_${TS}" .
 sudo rm -rf "${BACKUP_DIR}/uploadedfiles_${TS}"
 echo "Copying files into cenagis drive 😇😇😇  "
-cp arches_data/backups/arches_slocal_${TS}.dump /mnt/drive/arches_slocal_${TS}.dump
-cp arches_data/backups/uploadedfiles_${TS}.tar.gz /mnt/drive/uploadedfiles_${TS}.tar.gz
+cp "${BACKUP_DIR}/arches_slocal_${TS}.dump" /mnt/drive/arches_slocal_${TS}.dump
+cp "${BACKUP_DIR}/uploadedfiles_${TS}.tar.gz" /mnt/drive/uploadedfiles_${TS}.tar.gz
 echo "DONE✅🔥🔥🔥🔥🔥✅✅✅✅✅🔥🔥🔥✅: ${BACKUP_DIR}"
