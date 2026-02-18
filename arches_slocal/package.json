@@ -21,7 +21,8 @@
     },
     "dependencies": {
         "arches": "archesproject/arches#stable/8.0.0",
-        "cesium": "^1.135.0"
+        "cesium": "^1.135.0",
+        "maplibre-gl": "^5.18.0"
     },
     "devDependencies": {
         "arches-dev-dependencies": "archesproject/arches-dev-dependencies#stable/8.0.0",
