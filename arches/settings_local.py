@@ -83,7 +83,6 @@ CELERY_BROKER_URL = "redis://@arches_redis:6379/0"
 #
 # CELERY_BROKER_URL = ""
 
-CANTALOUPE_HTTP_ENDPOINT = "http://{}:{}".format(get_env_variable("CANTALOUPE_HOST"), get_env_variable("CANTALOUPE_PORT"))
 ELASTICSEARCH_HTTP_PORT = get_env_variable("ESPORT")
 ELASTICSEARCH_HOSTS = [
     {
