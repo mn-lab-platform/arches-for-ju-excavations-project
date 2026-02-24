@@ -49,18 +49,6 @@ services:
         max-file: "10"
     networks:
       - arches_slocal_net
-  
-  # cantaloupe_arches_slocal:
-  #   container_name: cantaloupe_arches_slocal
-  #   image: uclalibrary/cantaloupe:5.0.3-0
-  #   volumes:
-  #     - uploads:/imageroot/uploadedfiles                        
-  #   ports:
-  #     - 8183:8182
-  #   env_file:
-  #     - ./.env
-  #   networks:
-  #     - arches_slocal_net
 
   arches_redis:
     container_name: arches_redis
@@ -133,6 +121,7 @@ services:
       - arches_slocal_net
 
   titiler:
+    container_name: titiler
     build:
       context: .
       dockerfile: titiler/Dockerfile
