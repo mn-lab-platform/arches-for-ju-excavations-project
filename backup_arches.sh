@@ -6,6 +6,7 @@ source ./.env
 # ---- CONFIG ----
 BACKUP_DIR="/mnt/storage/arches/arches_data/backups"
 DB_CONTAINER="arches_db"
+ARCHES_CONTAINER="arches"
 
 # From .env / your setup:
 DB_NAME="${ARCHES_PROJECT}"
@@ -21,10 +22,14 @@ sudo docker exec -e PGPASSWORD="${DB_PASSWORD}" "${DB_CONTAINER}" \
   > "${BACKUP_DIR}/${DB_NAME}_${TS}.dump"
 
 echo "[2/2] 🧠Uploaded files volume -> ${BACKUP_DIR}/uploadedfiles_${TS}.tar.gz"
-sudo docker cp cantaloupe_arches_slocal:/imageroot/uploadedfiles "${BACKUP_DIR}/uploadedfiles_${TS}"
+# Changed source container and path
+sudo docker cp "${ARCHES_CONTAINER}:/arches_app/${ARCHES_PROJECT}/${ARCHES_PROJECT}/uploadedfiles" "${BACKUP_DIR}/uploadedfiles_${TS}"
 sudo tar -czf "${BACKUP_DIR}/uploadedfiles_${TS}.tar.gz" -C "${BACKUP_DIR}/uploadedfiles_${TS}" .
 sudo rm -rf "${BACKUP_DIR}/uploadedfiles_${TS}"
+
 echo "Copying files into cenagis drive 😇😇😇  "
-cp "${BACKUP_DIR}/arches_slocal_${TS}.dump" /mnt/drive/arches_slocal_${TS}.dump
-cp "${BACKUP_DIR}/uploadedfiles_${TS}.tar.gz" /mnt/drive/uploadedfiles_${TS}.tar.gz
+# Fixed variable reference for the dump file (was hardcoded arches_slocal)
+cp "${BACKUP_DIR}/${DB_NAME}_${TS}.dump" "/mnt/drive/${DB_NAME}_${TS}.dump"
+cp "${BACKUP_DIR}/uploadedfiles_${TS}.tar.gz" "/mnt/drive/uploadedfiles_${TS}.tar.gz"
 echo "DONE✅🔥🔥🔥🔥🔥✅✅✅✅✅🔥🔥🔥✅: ${BACKUP_DIR}"
+
