@@ -24,3 +24,7 @@ docker exec -it arches python manage.py shell -c "from arches.app.models.models 
 ./restore_arches.sh 2026-01-12_1354 https://tap.mn.cenagis.edu.pl http://dev.mn.cenagis.edu.pl
 
 docker exec -it arches tail -f /var/log/celery/worker.log
+
+docker exec -it arches python manage.py shell -c "from django.apps import apps; [print(f'{m._meta.app_label}.{m.__name__}') for m in apps.get_models()]"
+
+docker exec -it arches python manage.py shell -c "from django.core.cache import cache; cache.clear()"
