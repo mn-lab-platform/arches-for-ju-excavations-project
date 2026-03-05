@@ -1,0 +1,4 @@
+[submodule "arches_slocal/arches_slocal/views/services/crs"]
+	path = arches_slocal/arches_slocal/views/services/crs
+	url = https://gitlab.cenagis.edu.pl/uavgeolab/symbiont/definiowanie-ukladow-lokalnych.git
+	branch = arches
