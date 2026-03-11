@@ -106,19 +106,19 @@ services:
     networks:
       - arches_slocal_net
 
-  nginx:
-    container_name: nginx
-    image: nginx:alpine
-    ports:
-      - "80:80"
-    volumes:  
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - arches-static:/static_root:ro
-      - uploads:/media_root/uploadedfiles:ro                        
-    depends_on:
-      - arches
-    networks:
-      - arches_slocal_net
+  # nginx:
+  #   container_name: nginx
+  #   image: nginx:alpine
+  #   ports:
+  #     - "80:80"
+  #   volumes:  
+  #     - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+  #     - arches-static:/static_root:ro
+  #     - uploads:/media_root/uploadedfiles:ro                        
+  #   depends_on:
+  #     - arches
+  #   networks:
+  #     - arches_slocal_net
 
   titiler:
     container_name: titiler
@@ -135,6 +135,23 @@ services:
     environment:
       - TITILER_ALLOW_LOCAL=true
 
+  cron:
+    container_name: arches_cron
+    build:
+      context: .
+      dockerfile: cron/Dockerfile
+    restart: always
+    volumes:
+      - ./:/workdir
+      - ../arches_data:/arches_data
+      - /mnt/storage/arches/arches_data/backups:/mnt/storage/arches/arches_data/backups      
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - arches
+      - arches_db
+    networks:
+      - arches_slocal_net
+
 networks:
   arches_slocal_net:
     driver: bridge
@@ -150,4 +167,4 @@ volumes:
   arches-log:
   arches-static:
   arches-app:
-  uploads:                                                      
+  uploads:
