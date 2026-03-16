@@ -4,3 +4,6 @@
 [submodule "arches_slocal/arches_slocal/media/js/map-plugin"]
 	path = arches_slocal/arches_slocal/media/js/map-plugin
 	url = https://gitlab.cenagis.edu.pl/uavgeolab/mare-nostrum/arches-map-plugin.git
+[submodule "arches_slocal/arches_slocal/media/js/maplibre-viewer"]
+	path = arches_slocal/arches_slocal/media/js/maplibre-viewer
+	url = https://gitlab.cenagis.edu.pl/uavgeolab/mare-nostrum/arches-map-plugin.git
