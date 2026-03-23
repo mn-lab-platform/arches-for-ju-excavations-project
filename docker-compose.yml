@@ -49,18 +49,6 @@ services:
         max-file: "10"
     networks:
       - arches_slocal_net
-  
-  # cantaloupe_arches_slocal:
-  #   container_name: cantaloupe_arches_slocal
-  #   image: uclalibrary/cantaloupe:5.0.3-0
-  #   volumes:
-  #     - uploads:/imageroot/uploadedfiles                        
-  #   ports:
-  #     - 8183:8182
-  #   env_file:
-  #     - ./.env
-  #   networks:
-  #     - arches_slocal_net
 
   arches_redis:
     container_name: arches_redis
@@ -122,7 +110,7 @@ services:
     container_name: nginx
     image: nginx:alpine
     ports:
-      - "80:80"
+      - "${PUBLIC_PORT}:80"
     volumes:  
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - arches-static:/static_root:ro
@@ -133,6 +121,7 @@ services:
       - arches_slocal_net
 
   titiler:
+    container_name: titiler
     build:
       context: .
       dockerfile: titiler/Dockerfile
@@ -145,6 +134,23 @@ services:
       - arches_slocal_net
     environment:
       - TITILER_ALLOW_LOCAL=true
+
+  cron:
+    container_name: arches_cron
+    build:
+      context: .
+      dockerfile: cron/Dockerfile
+    restart: always
+    volumes:
+      - ./:/workdir
+      - ../arches_data:/arches_data
+      - /mnt/storage/arches/arches_data/backups:/mnt/storage/arches/arches_data/backups      
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - arches
+      - arches_db
+    networks:
+      - arches_slocal_net
 
 networks:
   arches_slocal_net:
@@ -161,4 +167,4 @@ volumes:
   arches-log:
   arches-static:
   arches-app:
-  uploads:                                                      
+  uploads:
