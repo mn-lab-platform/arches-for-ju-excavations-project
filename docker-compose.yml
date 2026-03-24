@@ -135,6 +135,23 @@ services:
     environment:
       - TITILER_ALLOW_LOCAL=true
 
+  cron:
+    container_name: arches_cron
+    build:
+      context: .
+      dockerfile: cron/Dockerfile
+    restart: always
+    volumes:
+      - ./:/workdir
+      - ../arches_data:/arches_data
+      - /mnt/storage/arches/arches_data/backups:/mnt/storage/arches/arches_data/backups      
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - arches
+      - arches_db
+    networks:
+      - arches_slocal_net
+
 networks:
   arches_slocal_net:
     driver: bridge
@@ -150,4 +167,4 @@ volumes:
   arches-log:
   arches-static:
   arches-app:
-  uploads:                                                      
+  uploads:
