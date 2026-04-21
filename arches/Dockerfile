@@ -173,6 +173,7 @@ RUN pip install supervisor \
     && pip install rasterio \
     && pip install pyproj==3.7.2 \
     && pip install pyvips \
+    && pip install numpy==2.4.2 \
     && pip install "djangorestframework>=3.14.0"
 
 # create a new Arches project
