@@ -25,7 +25,8 @@
         "maplibre-gl": "^5.18.0",
         "@turf/turf": "^6.5.0",
         "@turf/rewind": "^6.5.0",
-        "turf": "npm:@turf/turf@^6.5.0"
+        "turf": "npm:@turf/turf@^6.5.0",
+        "jspdf": "^2.5.2"
     },
     "devDependencies": {
         "arches-dev-dependencies": "archesproject/arches-dev-dependencies#stable/8.0.0",
