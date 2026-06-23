@@ -3,7 +3,7 @@
 ## 1. Setting up arches on your brand new machine
 1. Clone the source code from Arches for Excavation repo: 
     ```
-    git clone https://gitlab.cenagis.edu.pl/uavgeolab/mare-nostrum/arches.git
+    git clone --recurse-submodules https://gitlab.cenagis.edu.pl/uavgeolab/mare-nostrum/arches.git
     ```
 2. Create an .env file by copying the `edit_dot_env` file: 
     ```
