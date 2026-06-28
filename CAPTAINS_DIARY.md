@@ -12,6 +12,3 @@
 😭😭😭Podczas npm run build_development
 [webpack-cli] Error: EACCES: permission denied, unlink '/arches_app/arches_slocal/arches_slocal/media/build/cesium/Assets/Textures/maki/hospital.png'
 - wywołać jeszcze raz run build_development 🤯
-
-Dodanie sparql service provider
-- arches_slocal.sparql_providers.kerameikos.Kerameikos_Provider
