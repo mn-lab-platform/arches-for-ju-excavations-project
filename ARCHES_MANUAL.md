@@ -114,3 +114,5 @@
 
     - *footer_additional_text*: Fine print, addresses, or contact details in the footer. Wrap in mark_safe() to support HTML entities like "&middot;".
 
+    Email template created by us requires providing 2 icons that will be placed in the header and footer of the email. Place the icons in: `\media\img\mailing\footer_logo.png` and `\media\img\mailing\header_logo.png`.
+
