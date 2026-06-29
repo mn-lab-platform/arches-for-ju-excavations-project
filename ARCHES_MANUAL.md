@@ -37,9 +37,14 @@
     docker exec -it arches python manage.py collectstatic --noinput --verbosity 2
     ```
 
+    If the problem persists after executing those commands (for example search page is loading infinitely) execute:
+    ```
+    docker compose restart
+    ```
+
 5. In case by now you can see the arches landing page, you got yourself a working Arches Project Instance. If something still doesn't work, compare your error message to those (not very maturely) listed inside `CAPTAINS_DIARY.md`.
 
-6. Register the custom plugins and reports. Execute the automatic registration script:
+6. (Optional) Register the custom plugins and reports. Execute the automatic registration script:
     ```
     ./register_all.sh
     ```
