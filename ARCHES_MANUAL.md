@@ -79,7 +79,7 @@
     - *EXCAVATION_NAME*: Name of the specific excavation site you are setting the arches instance up for. It will be displayed as the title of the slides in the landing page. Default: `Excavation Managed via Arches`.
     - *CUSTOM_LANDING_MEDIA*: True/true/False/false; Set to True/true in case you want to provide your own project logo as well as photos for the slides in the landing page.
 
-2. Add your own logo and images for the slides in the landing page. Remember to set the *CUSTOM_LANDING_MEDIA* variable to True/true in your `.env` file. If you did, go to `\media\img\landing` and create a new directory called `custom`. 
+2. Add your own logo and images for the slides in the landing page. Remember to set the *CUSTOM_LANDING_MEDIA* variable to True/true in your `.env` file. If you did, go to `{ARCHES_PROJECT}\{ARCHES_PROJECT}\media\img\landing` and create a new directory called `custom`. 
     - Place your logo in `\custom\project_logo.png`.
     - Place your first slide image in `\custom\landing_first.jpg`.
     - Place your second slide image in `\custom\landing_second.jpg`.
@@ -112,5 +112,5 @@
 
     - *footer_additional_text*: Fine print, addresses, or contact details in the footer. Wrap in mark_safe() to support HTML entities like "&middot;".
 
-    Email template created by us requires providing 2 icons that will be placed in the header and footer of the email. Place the icons in: `\media\img\mailing\footer_logo.png` and `\media\img\mailing\header_logo.png`.
+    Email template created by us requires providing 2 icons that will be placed in the header and footer of the email. Place the icons in: `{ARCHES_PROJECT}\{ARCHES_PROJECT}\media\img\mailing\footer_logo.png` and `{ARCHES_PROJECT}\{ARCHES_PROJECT}\media\img\mailing\header_logo.png`.
 
