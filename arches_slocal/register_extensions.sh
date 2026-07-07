@@ -3,7 +3,7 @@
 # Script to automatically register all plugins and reports in Arches
 # Run this from the host machine
 
-docker exec -it arches bash -c '
+
 echo "=== Starting automatic registration of plugins and reports ==="
 
 # Register all plugins/plugins in the plugins folder
@@ -37,4 +37,3 @@ else
 fi
 
 echo "=== Registration complete ==="
-'
