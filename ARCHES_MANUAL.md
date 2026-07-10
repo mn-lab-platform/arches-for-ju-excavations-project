@@ -42,9 +42,17 @@
     docker compose restart
     ```
 
-6. In case by now you can see the arches landing page, you got yourself a working Arches Project Instance. It should contain (TODO: List of available plugins + resource models).
+6. Register all Arches for Excavation custom reports and plugins in your instance:
+    ```
+    ./register_extensions.sh
+    ```
 
-7. (Optional) Set up mailing backend for your arches instance, to do so overwrite variables listed below inside your `.env` file:
+7. Import all Arches for Excavation Resource Models into your instance:
+    ```
+    docker exec -it arches python3 manage.py load_startup_graphs
+    ```
+
+8. (Optional) Set up mailing backend for your arches instance, to do so overwrite variables listed below inside your `.env` file:
     - *EMAIL_PASSWORD*: Password for your email server. **If your password contains special characters (like '$'), wrap it in single quotes to avoid issues with Docker/Python parsing**.
     - *DEFAULT_FROM_EMAIL*: The display name and email address that will appear as the sender (e.g., <noreply@arches.example.com>').
     - *EMAIL_USE_TLS*: True/true/False/false

@@ -260,6 +260,9 @@ module.exports = () => {
             }
         }
 
+        const turfRewindShimPath = Path.resolve(__dirname, APP_ROOT, 'media', 'js', 'shims', 'turf-rewind-shim.js');
+        const turfRewindShimDirectory = Path.dirname(turfRewindShimPath).replace(/\\/g, '/');
+
         resolve({
             entry: {
                 ...entryPoints,
@@ -303,6 +306,13 @@ module.exports = () => {
             },
             plugins: [
                 new CleanWebpackPlugin(),
+                new webpack.NormalModuleReplacementPlugin(/^@turf\/rewind$/, (resource) => {
+                    const issuerDirectory = (resource.context || '').replace(/\\/g, '/');
+                    if (issuerDirectory !== turfRewindShimDirectory) {
+                        resource.request = turfRewindShimPath;
+                    }
+                }),
+
                 new webpack.DefinePlugin(universalConstants),
                 new webpack.DefinePlugin({
                     ARCHES_URLS: webpack.DefinePlugin.runtimeValue(

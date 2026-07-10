@@ -351,23 +351,6 @@ run_setup_admin() {
     echo "---------------------------------------------------------------"
 }
 
-run_register_extensions() {
-	echo ""
-    echo "----- RUNNING REGISTER EXTENSIONS -----"
-    echo ""
-	cd ${APP_FOLDER}
-	source ./register_extensions.sh
-}
-
-run_load_startup_graphs() {
-	echo ""
-    echo "----- RUNNING LOAD STARTUP GRAPHS -----"
-    echo ""
-	cd ${APP_FOLDER}
-	echo "Loading startup graphs..."
-	python3 manage.py load_startup_graphs
-}
-
 #### Main commands
 run_arches() {
 	init_arches
@@ -376,8 +359,6 @@ run_arches() {
 	start_celery_supervisor
 	run_setup_arches_setup_webpack
 	run_setup_admin
-	run_register_extensions
-	run_load_startup_graphs
 	run_django_server
 }
 
@@ -433,14 +414,6 @@ do
             wait_for_db
             run_setup_admin
         ;;
-		run_register_extensions)
-			wait_for_db
-			run_register_extensions
-		;;
-		run_load_startup_graphs)
-			wait_for_db
-			run_load_startup_graphs
-		;;
 		run_setup_webpack)
 			run_setup_webpack
 		;;
