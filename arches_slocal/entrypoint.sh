@@ -351,14 +351,6 @@ run_setup_admin() {
     echo "---------------------------------------------------------------"
 }
 
-run_register_extensions() {
-	echo ""
-    echo "----- RUNNING REGISTER EXTENSIONS -----"
-    echo ""
-	cd ${APP_FOLDER}
-	source ./register_extensions.sh
-}
-
 #### Main commands
 run_arches() {
 	init_arches
