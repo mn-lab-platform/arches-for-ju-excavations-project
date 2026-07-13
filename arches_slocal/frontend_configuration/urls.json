@@ -1337,6 +1337,25 @@
             ]
         }
     ],
+    "api": [
+        {
+            "url": "/api/iiif/build-geotiff-manifest",
+            "params": []
+        },
+        {
+            "url": "/api/iiif/geotiff-manifest/{resource_id}",
+            "params": [
+                "resource_id"
+            ]
+        },
+        {
+            "url": "/api/iiif/geotiff-file/{job_id}/{kind}",
+            "params": [
+                "job_id",
+                "kind"
+            ]
+        }
+    ],
     "api_bulk_disambiguated_resource_instance": [
         {
             "url": "/api/bulk_disambiguated_resource_instance",
@@ -1525,6 +1544,24 @@
             "params": []
         }
     ],
+    "basemap_access_info": [
+        {
+            "url": "/api/basemap/access-info",
+            "params": []
+        }
+    ],
+    "basemap_check_name": [
+        {
+            "url": "/api/basemap/check-name",
+            "params": []
+        }
+    ],
+    "basemaps": [
+        {
+            "url": "/api/basemap/upload",
+            "params": []
+        }
+    ],
     "buffer": [
         {
             "url": "/buffer/",
@@ -1536,6 +1573,14 @@
             "url": "/card/{cardid}",
             "params": [
                 "cardid"
+            ]
+        }
+    ],
+    "celery_task_status": [
+        {
+            "url": "/api/celery/task-status/{task_id}",
+            "params": [
+                "task_id"
             ]
         }
     ],
@@ -1639,6 +1684,12 @@
             ]
         }
     ],
+    "delete_iiif_annotation": [
+        {
+            "url": "/api/manifest/delete_annotation",
+            "params": []
+        }
+    ],
     "delete_instances": [
         {
             "url": "/graph/{graphid}/delete_instances",
@@ -1667,6 +1718,18 @@
             "params": [
                 "graphid"
             ]
+        }
+    ],
+    "dem_pixel_sample": [
+        {
+            "url": "/api/iiif/dem/pixel",
+            "params": []
+        }
+    ],
+    "dem_pixel_value": [
+        {
+            "url": "/api/iiif/dem/pixel-value",
+            "params": []
         }
     ],
     "dismiss_notifications": [
@@ -1777,14 +1840,6 @@
             ]
         }
     ],
-    "files": [
-        {
-            "url": "/files/{path}",
-            "params": [
-                "path"
-            ]
-        }
-    ],
     "from_sparql_endpoint": [
         {
             "url": "/concepts/{conceptid}/from_sparql_endpoint",
@@ -1812,6 +1867,12 @@
     "geojson": [
         {
             "url": "/geojson",
+            "params": []
+        }
+    ],
+    "geotiff_process": [
+        {
+            "url": "/api/iiif/geotiff-upload",
             "params": []
         }
     ],
@@ -1973,6 +2034,28 @@
             "params": []
         }
     ],
+    "iiif-photo-upload": [
+        {
+            "url": "/api/iiif/photo-upload",
+            "params": []
+        }
+    ],
+    "iiif_allmaps_layers": [
+        {
+            "url": "/api/iiif/{resource_id}/allmaps-layers",
+            "params": [
+                "resource_id"
+            ]
+        }
+    ],
+    "iiif_resource_context": [
+        {
+            "url": "/api/iiif/resource-context/{resource_id}",
+            "params": [
+                "resource_id"
+            ]
+        }
+    ],
     "iiifannotationnodes": [
         {
             "url": "/iiifannotationnodes",
@@ -2025,6 +2108,27 @@
             "params": []
         }
     ],
+    "local_coordinate_system_assign": [
+        {
+            "url": "/api/local-coordinate-system/assign",
+            "params": []
+        }
+    ],
+    "local_coordinate_system_define": [
+        {
+            "url": "/api/local-coordinate-system/define",
+            "params": []
+        }
+    ],
+    "local_coordinate_system_download": [
+        {
+            "url": "/api/local-coordinate-system/{resource_id}/download/{definition_type}",
+            "params": [
+                "resource_id",
+                "definition_type"
+            ]
+        }
+    ],
     "make_collection": [
         {
             "url": "/concepts/{conceptid}/make_collection/",
@@ -2038,6 +2142,14 @@
             "url": "/manifest/{id}",
             "params": [
                 "id"
+            ]
+        }
+    ],
+    "manifest_edit": [
+        {
+            "url": "/api/iiif/geotiff-manifest/edit/{resource_id}",
+            "params": [
+                "resource_id"
             ]
         }
     ],
@@ -2064,6 +2176,12 @@
     "media_url": [
         {
             "url": "/files/",
+            "params": []
+        }
+    ],
+    "model_3d_upload": [
+        {
+            "url": "/api/model-3d/upload/",
             "params": []
         }
     ],
@@ -2500,6 +2618,12 @@
             "params": []
         }
     ],
+    "save_iiif_annotation_db": [
+        {
+            "url": "/api/manifest/update_db",
+            "params": []
+        }
+    ],
     "search_home": [
         {
             "url": "/search",
@@ -2608,6 +2732,23 @@
         {
             "url": "/search/time_wheel_config",
             "params": []
+        }
+    ],
+    "titiler-iiif-proxy": [
+        {
+            "url": "/iiif/api/iiif/titiler-proxy",
+            "params": []
+        }
+    ],
+    "titiler_tile_proxy": [
+        {
+            "url": "/api/titiler/tiles/{basemap_id}/{z}/{x}/{y}",
+            "params": [
+                "basemap_id",
+                "z",
+                "x",
+                "y"
+            ]
         }
     ],
     "transaction_reverse": [
