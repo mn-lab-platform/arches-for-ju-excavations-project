@@ -8,6 +8,7 @@ docker exec -it arches npm run build_development
 docker exec -it arches python manage.py shell -c "from arches.app.models.models import ReportTemplate; deleted = ReportTemplate.objects.filter(name='<REPORT NAME>').delete(); print(f'Deleted {deleted[0]} Viewer report(s)')"
 docker exec -it arches python manage.py report list  
 docker exec -it arches python manage.py report register -s ./arches_slocal/reports/<REPORT NAME>.json 
+docker exec -it arches python manage.py shell -c "from arches.app.models.models import ReportTemplate; templates_to_keep = ['No Header Template', 'Image Header Template', 'Map Header Template', 'Tabbed Template']; deleted = ReportTemplate.objects.exclude(name__in=templates_to_keep).delete(); print(f'Deleted {deleted[0]} report template(s)')"
 
 /arches_app/arches-for-science/arches_for_science/templates/views/components/reports/digital-resource.htm
 

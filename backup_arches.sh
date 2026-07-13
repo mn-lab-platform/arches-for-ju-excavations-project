@@ -5,8 +5,8 @@ set -euo pipefail
 source ./.env
 # ---- CONFIG ----
 BACKUP_DIR="/mnt/storage/arches/arches_data/backups"
-DB_CONTAINER="arches_db"
-ARCHES_CONTAINER="arches"
+DB_CONTAINER="arches_db_dev"
+ARCHES_CONTAINER="arches_dev"
 
 # From .env / your setup:
 DB_NAME="${ARCHES_PROJECT}"
