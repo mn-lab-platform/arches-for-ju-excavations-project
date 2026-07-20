@@ -14,8 +14,8 @@ UPLOADED_FILES_FOLDER=$APP_COMP_FOLDER/uploadedfiles
 
 #Arches configs
 # NOTE: the ARCHES_NAMESPACE needs to look like a URL, ending in a '/',
-# with the same port as used by the Arches Django APP.
 ARCHES_NAMESPACE=http://$ARCHES_PROJECT:8000/
+
 # This will hopefully make the yarn build not fail.
 NODE_OPTIONS='--max-old-space-size=1024'
 INSTALL_DEFAULT_GRAPHS=True
@@ -43,7 +43,7 @@ DOMAIN_NAMES=tap.mn.cenagis.edu.pl localhost 127.0.0.1
 BUILD_PRODUCTION=False
 PYTHONUNBUFFERED=0
 ELASTICSEARCH_PREFIX=$ARCHES_PROJECT
-
+ARCHES_EXPORT_NAMESPACE=https://$DEPLOY_HOST/
 # RabbitMQ credentials. We're currently using Redis as a task
 # broker, not RabbitMQ, so these are commented out.
 # RABBITMQ_USER=guest

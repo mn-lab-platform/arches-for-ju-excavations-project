@@ -54,7 +54,10 @@ DATABASES = {
     }
 }
 
-ARCHES_NAMESPACE_FOR_DATA_EXPORT = get_env_variable("ARCHES_NAMESPACE")
+ARCHES_NAMESPACE_FOR_DATA_EXPORT = (
+    get_optional_env_variable("ARCHES_EXPORT_NAMESPACE")
+    or get_env_variable("ARCHES_NAMESPACE")
+)
 
 CACHES = {
     "default": {
