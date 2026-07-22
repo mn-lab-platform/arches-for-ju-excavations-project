@@ -7,6 +7,25 @@ from tkinter import filedialog, messagebox, ttk
 
 DOCKER_CONTAINER = "arches"
 
+DATATYPE_COMPATIBILITY = {
+    "string": {"string", "non-localized-string", "number"},
+    "non-localized-string": {"string", "non-localized-string", "number"},
+    "number": {"number", "string", "non-localized-string"},
+    "domain-value": {"domain-value", "concept", "concept-list"},
+    "concept": {"concept", "concept-list", "domain-value"},
+    "concept-list": {"concept", "concept-list", "domain-value"},
+    "resource-instance": {"resource-instance", "resource-instance-list"},
+    "resource-instance-list": {"resource-instance", "resource-instance-list"},
+    "date": {"date"},
+    "boolean": {"boolean"},
+    "file-list": {"file-list"},
+    "geojson-feature-collection": {"geojson-feature-collection", "non-localized-string"},
+}
+
+def datatypes_compatible(source_type, target_type):
+    return target_type in DATATYPE_COMPATIBILITY.get(source_type, {source_type})
+
+
 def run_docker_command(args):
     result = subprocess.run(
         args,
@@ -199,7 +218,9 @@ class MappingEditor(tk.Tk):
             return "DISABLED"
         if not mapping.get("target_node_id"):
             return "UNMAPPED"
-        if mapping["source_datatype"] != mapping.get("target_datatype"):
+        if mapping.get("special_transform"):
+            return "OK"
+        if not datatypes_compatible(mapping["source_datatype"], mapping.get("target_datatype")):
             return "MISMATCH"
         return "OK"
 
@@ -289,6 +310,11 @@ class MappingEditor(tk.Tk):
         if not messagebox.askyesno("Run migration", "Run migration with --apply?"):
             return
 
+        update_existing = messagebox.askyesno(
+            "Update existing",
+            "Update existing target resources matched by legacy ID? This replaces their mapped tile values.",
+        )
+
         local_tmp = Path("resource_mapping_tmp.json")
         container_path = "/tmp/resource_mapping_tmp.json"
 
@@ -304,12 +330,16 @@ class MappingEditor(tk.Tk):
                 f"{DOCKER_CONTAINER}:{container_path}",
             ])
 
-            output = run_docker_command([
+            migrate_cmd = [
                 "docker", "exec", DOCKER_CONTAINER,
                 "python", "manage.py", "migrate_data",
                 "--mapping", container_path,
                 "--apply",
-            ])
+            ]
+            if update_existing:
+                migrate_cmd.append("--update-existing")
+
+            output = run_docker_command(migrate_cmd)
 
             messagebox.showinfo("Migration complete", output or "Migration complete.")
 
