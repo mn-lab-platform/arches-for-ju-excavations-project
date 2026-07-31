@@ -1,9 +1,0 @@
-*.pyc
-*.log
-node_modules
-coverage/
-.vscode/
-*.egg-info
-.DS_STORE
-CACHE
-arches_slocal/media/build/js/

@@ -4,3 +4,4 @@
 .env
 /arches/arches_data/packages/
 **/media/img/landing/custom/
+package-lock.json

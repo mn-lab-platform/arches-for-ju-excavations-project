@@ -69,6 +69,7 @@ ARG ARCHES_PROJECT
 ARG APP_ROOT
 ARG APP_COMP_FOLDER
 ARG UPLOADED_FILES_FOLDER
+ARG GITLAB_TOKEN
 
 # settings_local.py provides the DB credentials, etc. to the Arches project.
 ENV SETTINGS_PATH=${APP_COMP_FOLDER}/settings.py
@@ -174,7 +175,8 @@ RUN pip install supervisor \
     && pip install pyproj==3.7.2 \
     && pip install pyvips \
     && pip install numpy==2.4.2 \
-    && pip install "djangorestframework>=3.14.0"
+    && pip install "djangorestframework>=3.14.0" \
+    && pip install --no-cache-dir git+https://oauth2:${GITLAB_TOKEN}@gitlab.cenagis.edu.pl/uavgeolab/mare-nostrum/arches-for-excavation-application.git
 
 # create a new Arches project
 RUN mkdir -p /new_arches_proj
@@ -206,14 +208,15 @@ RUN echo "copy gunicorn_config.py to ${GUNICORN_CONFIG_PATH}";
 COPY ./arches/gunicorn_config.py ${GUNICORN_CONFIG_PATH}
 RUN sed -i 's/\r$//g' ${GUNICORN_CONFIG_PATH}
 
-# Copy customized package until the issue with datatables.net is resolved.
-# COPY ./arches/package.json ${PACKAGE_PATH}
+COPY ./${ARCHES_PROJECT}/media/ ${APP_COMP_FOLDER}/media/
+COPY ./${ARCHES_PROJECT}/package.json ${APP_ROOT}/package.json
+COPY ./${ARCHES_PROJECT}/webpack/webpack.common.js ${APP_ROOT}/webpack/webpack.common.js
 
 # copy the celery supervisor
-COPY /arches/conf.d/ ${APP_ROOT}/conf.d/
+COPY /${ARCHES_PROJECT}/conf.d/ ${APP_ROOT}/conf.d/
 RUN chmod -R 700 ${APP_ROOT}/conf.d/
-COPY /arches/arches_slocal-supervisor.conf ${APP_ROOT}/arches_slocal-supervisor.conf
-RUN chmod -R 700 ${APP_ROOT}/arches_slocal-supervisor.conf
+COPY /${ARCHES_PROJECT}/arches_for_excavation-supervisor.conf ${APP_ROOT}/arches_for_excavation-supervisor.conf
+RUN chmod -R 700 ${APP_ROOT}/arches_for_excavation-supervisor.conf
 RUN mkdir -p /var/log/supervisor
 RUN mkdir -p /var/log/celery
 

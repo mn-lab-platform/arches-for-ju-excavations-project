@@ -11,7 +11,6 @@ WEBPACK_STATS_PATH=${APP_FOLDER}/webpack-stats.json
 # Environmental Variables
 export DJANGO_PORT=${DJANGO_PORT:-8000}
 COUCHDB_URL=${COUCHDB_URL}
-
 #Utility functions that check db status
 wait_for_db() {
 	echo "Testing if database server is up..."
@@ -342,6 +341,16 @@ run_django_server() {
 	fi
 }
 
+run_setup_admin() {
+    echo ""
+    echo "----- RUNNING SETUP ADMIN -----"
+    echo ""
+    cd ${APP_FOLDER}
+    echo "Setting up superuser from environment variables..."
+    python3 setup_admin.py
+    echo "---------------------------------------------------------------"
+}
+
 #### Main commands
 run_arches() {
 	init_arches
@@ -349,6 +358,7 @@ run_arches() {
 	run_createcachetable
 	start_celery_supervisor
 	run_setup_arches_setup_webpack
+	run_setup_admin
 	run_django_server
 }
 
@@ -400,6 +410,10 @@ do
 		run_setup_arches_setup_webpack)
 			run_setup_arches_setup_webpack
 		;;
+		run_setup_admin)
+            wait_for_db
+            run_setup_admin
+        ;;
 		run_setup_webpack)
 			run_setup_webpack
 		;;

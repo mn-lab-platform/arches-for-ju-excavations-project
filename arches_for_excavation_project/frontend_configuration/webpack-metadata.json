@@ -1,0 +1,15 @@
+{
+    "_comment": "This is a generated file. Do not edit directly.",
+    "APP_RELATIVE_PATH": "arches_for_excavation",
+    "APP_ROOT": "/arches_app/arches_for_excavation/arches_for_excavation",
+    "ARCHES_APPLICATIONS": [
+        "arches_for_excavation"
+    ],
+    "ARCHES_APPLICATIONS_PATHS": {
+        "arches_for_excavation": "/arches_app/arches_for_excavation/arches_for_excavation"
+    },
+    "SITE_PACKAGES_DIRECTORY": "/opt/venv/lib/python3.13/site-packages",
+    "ROOT_DIR": "/opt/venv/lib/python3.13/site-packages/arches",
+    "STATIC_URL": "/static/",
+    "WEBPACK_DEVELOPMENT_SERVER_PORT": 9000
+}

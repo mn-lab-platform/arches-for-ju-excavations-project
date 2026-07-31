@@ -24,7 +24,7 @@ services:
         max-size: "10k"
         max-file: "10"
     networks:
-      - arches_slocal_net
+      - arches_for_excavation_net
 
   arches_elasticsearch:
     container_name: arches_elasticsearch
@@ -48,7 +48,7 @@ services:
         max-size: "10k"
         max-file: "10"
     networks:
-      - arches_slocal_net
+      - arches_for_excavation_net
 
   arches_redis:
     container_name: arches_redis
@@ -65,7 +65,7 @@ services:
         max-size: "10k"
         max-file: "10"
     networks:
-      - arches_slocal_net
+      - arches_for_excavation_net
 
   arches:
     container_name: arches
@@ -81,6 +81,7 @@ services:
         APP_ROOT: ${APP_ROOT}
         APP_COMP_FOLDER: ${APP_COMP_FOLDER}
         UPLOADED_FILES_FOLDER: ${UPLOADED_FILES_FOLDER}
+        GITLAB_TOKEN: ${GITLAB_TOKEN}
     restart: unless-stopped
     environment:
       - DEBUG="${DJANGO_DEBUG}"
@@ -101,11 +102,11 @@ services:
     volumes:
       - arches-log:/web_root/logs
       - arches-static:/static_root
-      - ./${ARCHES_PROJECT}:/arches_app/${ARCHES_PROJECT}
-      - uploads:/arches_app/arches_slocal/arches_slocal/uploadedfiles   
+      - uploads:/arches_app/${ARCHES_PROJECT}/uploadedfiles   
       - ../arches_data/:/arches_data
+      # - ../arches-app/arches_for_excavation:/opt/venv/lib/python3.13/site-packages/arches_for_excavation
     networks:
-      - arches_slocal_net
+      - arches_for_excavation_net
 
   nginx:
     container_name: nginx
@@ -120,7 +121,7 @@ services:
     depends_on:
       - arches
     networks:
-      - arches_slocal_net
+      - arches_for_excavation_net
 
   titiler:
     container_name: titiler
@@ -134,7 +135,7 @@ services:
     volumes:
       - uploads:/data:ro
     networks:
-      - arches_slocal_net
+      - arches_for_excavation_net
     environment:
       - TITILER_ALLOW_LOCAL=true
 
@@ -153,12 +154,12 @@ services:
       - arches
       - arches_db
     networks:
-      - arches_slocal_net
+      - arches_for_excavation_net
 
 networks:
-  arches_slocal_net:
+  arches_for_excavation_net:
     driver: bridge
-    name: arches_slocal_net
+    name: arches_for_excavation_net
 
 volumes:
   redisdata:

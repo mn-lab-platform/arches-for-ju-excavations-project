@@ -5,6 +5,7 @@ from django.urls import include, path
 
 urlpatterns = [
     # project-level urls
+    path("", include("arches_for_excavation.urls")),
 ]
 
 

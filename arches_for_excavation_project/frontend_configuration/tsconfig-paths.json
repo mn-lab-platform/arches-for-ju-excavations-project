@@ -1,0 +1,16 @@
+{
+    "_comment": "This is a generated file. Do not edit directly.",
+    "compilerOptions": {
+        "paths": {
+            "@/arches/*": [
+                "../../../opt/venv/lib/python3.13/site-packages/arches/app/src/arches/*"
+            ],
+            "@/arches_for_excavation/*": [
+                "../arches_for_excavation/src/arches_for_excavation/*"
+            ],
+            "*": [
+                "../node_modules/*"
+            ]
+        }
+    }
+}

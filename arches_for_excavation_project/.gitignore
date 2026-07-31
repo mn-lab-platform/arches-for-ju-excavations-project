@@ -1,0 +1,9 @@
+*.pyc
+*.log
+node_modules
+coverage/
+.vscode/
+*.egg-info
+.DS_STORE
+CACHE
+arches_for_excavation/media/build/js/

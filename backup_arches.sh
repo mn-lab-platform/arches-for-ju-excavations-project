@@ -28,7 +28,6 @@ sudo tar -czf "${BACKUP_DIR}/uploadedfiles_${TS}.tar.gz" -C "${BACKUP_DIR}/uploa
 sudo rm -rf "${BACKUP_DIR}/uploadedfiles_${TS}"
 
 echo "Copying files into cenagis drive 😇😇😇  "
-# Fixed variable reference for the dump file (was hardcoded arches_slocal)
 cp "${BACKUP_DIR}/${DB_NAME}_${TS}.dump" "/mnt/drive/${DB_NAME}_${TS}.dump"
 cp "${BACKUP_DIR}/uploadedfiles_${TS}.tar.gz" "/mnt/drive/uploadedfiles_${TS}.tar.gz"
 echo "DONE✅🔥🔥🔥🔥🔥✅✅✅✅✅🔥🔥🔥✅: ${BACKUP_DIR}"

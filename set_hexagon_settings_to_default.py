@@ -6,8 +6,8 @@ import django
 from django.db import transaction
 from django.utils import timezone
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches_slocal.settings")
-sys.path.insert(0, "/arches_app/arches_slocal")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches_for_excavation.settings")
+sys.path.insert(0, "/arches_app/arches_for_excavation")
 django.setup()
 
 from arches.app.models.models import TileModel, ResourceInstance

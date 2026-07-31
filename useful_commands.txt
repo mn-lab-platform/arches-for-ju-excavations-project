@@ -1,4 +1,4 @@
-docker exec -it arches rm -rf /arches_app/arches_slocal/arches_slocal/media/build/* 
+docker exec -it arches rm -rf /arches_app/arches_for_excavation/arches_for_excavation/media/build/* 
  
 docker exec -it arches python manage.py collectstatic --noinput --verbosity 2   
 docker exec arches python manage.py collectstatic --noinput --clear
@@ -7,18 +7,18 @@ docker exec -it arches npm run build_development
 
 docker exec -it arches python manage.py shell -c "from arches.app.models.models import ReportTemplate; deleted = ReportTemplate.objects.filter(name='<REPORT NAME>').delete(); print(f'Deleted {deleted[0]} Viewer report(s)')"
 docker exec -it arches python manage.py report list  
-docker exec -it arches python manage.py report register -s ./arches_slocal/reports/<REPORT NAME>.json 
+docker exec -it arches python manage.py report register -s ./arches_for_excavation/reports/<REPORT NAME>.json 
 docker exec -it arches python manage.py shell -c "from arches.app.models.models import ReportTemplate; templates_to_keep = ['No Header Template', 'Image Header Template', 'Map Header Template', 'Tabbed Template']; deleted = ReportTemplate.objects.exclude(name__in=templates_to_keep).delete(); print(f'Deleted {deleted[0]} report template(s)')"
 
 /arches_app/arches-for-science/arches_for_science/templates/views/components/reports/digital-resource.htm
 
 docker exec arches find / -name "bhutan_tigersnest_lr.jpg"
 
-docker exec -it arches python manage.py fn register --source ./arches_slocal/functions/rti_function.py
+docker exec -it arches python manage.py fn register --source ./arches_for_excavation/functions/rti_function.py
 
 docker exec -it arches python manage.py changepassword admin
 
-docker cp C:\Users\filo1\Desktop\praca\cesium_sandbox\legit\sandbox\public\georeferenced arches:/arches_app/arches_slocal/arches_slocal/uploadedfiles/
+docker cp C:\Users\filo1\Desktop\praca\cesium_sandbox\legit\sandbox\public\georeferenced arches:/arches_app/arches_for_excavation/arches_for_excavation/uploadedfiles/
 
 docker exec -it arches python manage.py shell -c "from arches.app.models.models import ReportTemplate; reports = ReportTemplate.objects.all(); print('\n=== Registered Reports ==='); [print(f'Template ID: {report.templateid}\nName: {report.name}\nComponent: {report.component}\n' + '-'*50) for report in reports]; print(f'\nTotal reports: {reports.count()}')"
 

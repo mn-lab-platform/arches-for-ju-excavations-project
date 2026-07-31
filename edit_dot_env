@@ -1,10 +1,10 @@
 # Edit this file and save as ".env" for use.
 
-COMPOSE_PROJECT_NAME=arches_slocal
+COMPOSE_PROJECT_NAME=arches_for_excavation
 TZ=PST
 
 #arches project and paths
-ARCHES_PROJECT=arches_slocal
+ARCHES_PROJECT=arches_for_excavation
 ARCHES_ROOT=/arches_app
 APP_ROOT=$ARCHES_ROOT/$ARCHES_PROJECT
 APP_COMP_FOLDER=$APP_ROOT/$ARCHES_PROJECT
