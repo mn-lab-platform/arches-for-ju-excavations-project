@@ -211,6 +211,9 @@ RUN sed -i 's/\r$//g' ${GUNICORN_CONFIG_PATH}
 COPY ./${ARCHES_PROJECT}/media/ ${APP_COMP_FOLDER}/media/
 COPY ./${ARCHES_PROJECT}/package.json ${APP_ROOT}/package.json
 COPY ./${ARCHES_PROJECT}/webpack/webpack.common.js ${APP_ROOT}/webpack/webpack.common.js
+COPY ./arches_for_excavation_project/register_extensions.sh ${APP_ROOT}/register_extensions.sh
+RUN chmod -R 700 ${APP_ROOT}/register_extensions.sh &&\
+    dos2unix ${APP_ROOT}/register_extensions.sh
 
 # copy the celery supervisor
 COPY /${ARCHES_PROJECT}/conf.d/ ${APP_ROOT}/conf.d/

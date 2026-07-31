@@ -1,15 +1,18 @@
 #!/bin/bash
 
-APP_ROOT=${APP_ROOT}
-ARCHES_PROJECT=${ARCHES_PROJECT}
+echo "=== Starting automatic registration of plugins and reports ==="
 
-PLUGINS_DIR="${APP_ROOT}/${ARCHES_PROJECT}/plugins"
-REPORTS_DIR="${APP_ROOT}/${ARCHES_PROJECT}/reports"
+ARCHES_FOR_EXCAVATION_DIR=$(python -c "import arches_for_excavation, os; print(os.path.dirname(arches_for_excavation.__file__))")
+
+PLUGINS_DIR="${ARCHES_FOR_EXCAVATION_DIR}/plugins"
+REPORTS_DIR="${ARCHES_FOR_EXCAVATION_DIR}/reports"
+
 echo "Using plugins directory: $PLUGINS_DIR"
 echo "Using reports directory: $REPORTS_DIR"
 
-echo "=== Starting automatic registration of plugins and reports ==="
-
+# ---------------------------------------------------------
+# 1. Register Plugins
+# ---------------------------------------------------------
 echo "Checking for plugins in: $PLUGINS_DIR"
 if [ -d "$PLUGINS_DIR" ]; then
     for func_file in "$PLUGINS_DIR"/*; do
