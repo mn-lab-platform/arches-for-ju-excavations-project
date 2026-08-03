@@ -5,7 +5,7 @@ set -euo pipefail
 source ./.env
 
 # ---- CONFIG ----
-BACKUP_DIR="../arches_data/backups"
+BACKUP_DIR="../arches_data"
 DB_CONTAINER="arches_db"
 
 DB_NAME="${ARCHES_PROJECT}"
@@ -88,7 +88,7 @@ fi
 
 echo "[3/5] Restoring database -> ${DB_NAME}"
 DUMP_FILENAME=$(basename "${DB_DUMP}")
-CONTAINER_DUMP_PATH="/arches_data/backups/${DUMP_FILENAME}"
+CONTAINER_DUMP_PATH="/arches_data/${DUMP_FILENAME}"
 
 echo "  -> Command will use internal path: ${CONTAINER_DUMP_PATH}"
 
