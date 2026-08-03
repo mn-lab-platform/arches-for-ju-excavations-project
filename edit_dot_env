@@ -1,10 +1,10 @@
 # Edit this file and save as ".env" for use.
 
-COMPOSE_PROJECT_NAME=arches_for_excavation
+COMPOSE_PROJECT_NAME=arches_for_excavation_project
 TZ=PST
 
 #arches project and paths
-ARCHES_PROJECT=arches_for_excavation
+ARCHES_PROJECT=arches_for_excavation_project
 ARCHES_ROOT=/arches_app
 APP_ROOT=$ARCHES_ROOT/$ARCHES_PROJECT
 APP_COMP_FOLDER=$APP_ROOT/$ARCHES_PROJECT
@@ -36,8 +36,8 @@ DJANGO_DEBUG=False
 # Don't change the port, since it's pretty hard-coded.
 DJANGO_PORT=8000
 PUBLIC_PORT=80
-DEPLOY_HOST=tap.mn.cenagis.edu.pl
-DOMAIN_NAMES=tap.mn.cenagis.edu.pl localhost 127.0.0.1
+DEPLOY_HOST=YOUR_DEPLOY_HOST
+DOMAIN_NAMES=localhost 127.0.0.1 YOUR_DEPLOY_HOST
 # NOTE: Only set BUILD_PRODUCTION=True if you have well over
 # 8GB of system RAM. Otherwise, yarn will likely error out.
 BUILD_PRODUCTION=False
@@ -70,9 +70,9 @@ EMAIL_HOST_USER="USERNAME USED FOR SERVER AUTHENTICATION"
 EMAIL_PORT=587
 EMAIL_PASSWORD='YOUR EMAIL PASSWORD'
 
-# ARCHES INSTANCE
-ADMIN_USERNAME=admin
+# ARCHES FOR EXCAVATION INSTANCE
 ADMIN_PASSWORD=admin
 APP_TITLE="Arches for Excavation"
 EXCAVATION_NAME="Arches for Excavation"
-CUSTOM_LANDING_MEDIA=False
+
+PAC_WIKIDATA_ENDPOINT='https://pac.cenagis.edu.pl/wiki/sparql'
