@@ -1,129 +1,110 @@
-# arches-via-docker
-Deployment of Arches (archesproject.org) via Docker. We initially developed this repo to simplify and streamline deployment of Arches for use in archaeology and related instruction.
+# Arches for Excavation (Docker Deployment)
 
+The official Docker configuration for deploying the [**Arches for Excavation Application**](<LINK_TO_APP_REPO>). 
 
+This deployment stack, alongside the core application, was built by the [**Mare Nostrum Lab (Jagiellonian University in Kraków, Poland)**](https://mare.id.uj.edu.pl/pl) and is powered by the [**Arches Project**](https://www.archesproject.org/). 
 
-# Public Web Server and Localhost Deployments
+Special thanks to [**arches-via-docker**](https://github.com/opencontext/arches-via-docker) for the foundational Docker configurations used in this project.
 
-This main goal of this repo is to offer a simple, turnkey approach to deploying HTTPS secured Arches on the Web. However, this branch provides a simple approach to deploying the stable 8.0.x version of Arches for use on a `localhost` without starting Docker related to Web hosting (Nginx, SSL, etc.). Be sure to leave Arches with the Django `DEBUG` setting as `True`. See below for instructions on creating and editing an `.env` file.
+## Setting Up Arches for Excavation on Your Machine
+1. Clone this repository.
+    ```bash
+    git clone https://gitlab.cenagis.edu.pl/uavgeolab/mare-nostrum/arches-for-excavation-project.git
+    ```
+2. Create an .env file in the root of the cloned codebase, by copying the `edit_dot_env` file: 
+    ``` bash
+    cp edit_dot_env .env
+    ```
+3. Change essential env variables in the `.env` file:
+    - *PUBLIC_PORT*: The port on your machine that will be exposed to the internet and used for web access (e.g., 80).
+    - *DEPLOY_HOST*: The main domain name where your Arches instance will be accessible (e.g., arches.example.com).
+    - *DOMAIN_NAMES*: A space-separated list of all domains and IPs that should resolve to your Arches instance (e.g., arches.example.com localhost 127.0.0.1).
+    - *DJANGO_DEBUG*: True/true/False/false. Setting this option to True/true is useful during development, however for production-ready environments, it must strictly be set to False/false.
+    - *ADMIN_USERNAME*: Superuser login that you will use to log into your Arches for Excavation instance, as well as the admin panel in the browser.
+    - *ADMIN_PASSWORD*: Password for the superuser account described above.
+4. Make sure you are on the default branch called **main**. If you are, start your Arches Project instance: 
+    ```bash
+    docker compose up --build -d
+    ```
+    Feel free to go grab yourself a coffee, it might take a while :).
 
+     **If you encounter any issues** when trying to access your Arches instance in the browser, it is recommended to execute the following commands:
+    ```bash
+    docker exec -it arches npm install
+    ```
+    ```bash
+    docker exec -it arches npm run build_development
+    ```
+    ```bash
+    docker exec -it arches python manage.py collectstatic --noinput --verbosity 2
+    ```
 
-# The directories and files
-The following lists some information about the contents of this repo and how they fit together:
+    If the problem persists after executing those commands, run:
+    ```bash
+    docker compose restart
+    ```
 
-* `docker-compose.yml`
-* `.env` - specifies `COMPOSE_PROJECT_NAME` to make container names independent from the base directory name. specifies project configuration, e.g. domain names, emails, database connection details, etc. This file contains sensitive information.
-* `arches/`
-    * `Dockerfile`
-    * `arches_data` - A directory on your host machine that gets attached to the Arches container. This makes it convenient to pass data (like packages or exports) in and out of your Arches container.
-    * `conf.d/` - A directory of Supervisord configurations for the celery worker and celery beat processes. This gets copied into the Arches container.
-    * `celery.py` - Editable file if you want to modify your Arches project use of celery
-    * `arches_proj-supervisor.conf` - Supervisord configurations for the celery worker and celery beat processes
-    * `entrypoint.sh` - entrypoint script. This has some handy utility functions for some routine administration of the Arches container.
-    * `settings_local.py` - Editable python file to define project specific settings for your Arches instance. Many of the environment variables that you assign in your `.env` file
-    * `settings_local.py` - Editable python file configuring URLs in your Arches instance
-* `webpack/`
-    * `Dockerfile`
-    * `webpack_entrypoint.sh` - The `webpack` container is a minimalist container that invokes a docker command on the `arches` container. This command prepares static assets for the Arches frontend by running webpack and collectstatic.
+6. Register all Arches for Excavation custom reports, plugins and functions in your instance:
+    ```bash
+    docker exec -it arches ./register_extensions.sh
+    ```
 
+7. Import all Arches for Excavation ontology and resource models into your instance:
+    ```bash
+    docker exec -it arches python manage.py packages -o load_package -a arches_for_excavation -y
+    ```
 
-## Prerequisites
+8. (Optional) Set up mailing backend for your arches instance, to do so overwrite variables listed below inside your `.env` file:
+    - *EMAIL_PASSWORD*: Password for your email server. **If your password contains special characters (like '$'), wrap it in single quotes to avoid issues with Docker/Python parsing**.
+    - *DEFAULT_FROM_EMAIL*: The display name and email address that will appear as the sender (e.g., <noreply@arches.example.com>').
+    - *EMAIL_USE_TLS*: True/true/False/false
+    - *EMAIL_USE_SSL*: True/true/False/false
+    - *EMAIL_HOST*: The SMTP server address for sending emails (e.g., 'smtp.example.com').
+    - *EMAIL_HOST_USER*: The username for authenticating with your SMTP server.
+    - *EMAIL_PORT*: The port number for your SMTP server.
+    
+    After doing so, remember to restart your services in order for the system to acknowledge the changes:
+    ```bash
+    docker compose restart
+    ```
 
-1. [Docker](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) are installed.
-2. You have cloned this repository, and if deployting to a localhost only you use the `local` branch:
-   ```bash
-   git clone https://github.com/opencontext/arches-via-docker.git
-   git checkout origin/local
-   ```
+## Customizing Your Arches for Excavation
+1. Change the `.env` variables essential for this section:
+    - *APP_TITLE*: The name displayed as page title as well as in the landing page header. Default: `Arches for Excavation`.
+    - *EXCAVATION_NAME*: Name of the specific excavation site you are setting the Arches instance up for. It will be displayed as the title of the slides in the landing page. Default: `Arches for Excavation`.
+    - *CUSTOM_LANDING_MEDIA*: True/true/False/false; Set to True/true in case you want to provide your own project logo as well as photos for the slides in the landing page.
 
-### Note:
-This approach will setup the most current stable version of Arches (now v8.0) suitable for running on a localhost for testing purposes. If you want to deploy Arches version 6 (specifically stable version 6.2.4), please switch to the `v6` branch of this repo, with:
-   ```bash
-   git checkout origin/v6
-   ```
+2. Add your own logo and images for the slides in the landing page. Remember to set the *CUSTOM_LANDING_MEDIA* variable to True/true in your `.env` file. If you did, go to `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches_for_excavation_project\media\img\landing\custom`.
+    - Place your logo in `\custom\project_logo.png`.
+    - Place your first slide image in `\custom\landing_first.jpg`.
+    - Place your second slide image in `\custom\landing_second.jpg`.
+    - Place your third slide image in `\custom\landing_third.jpg`.
 
-If you want to deploy the latest stable version of Arches to a public (or organizational) Web server, use the `main` branch:
-   ```bash
-   git checkout origin/main
-   ```
+3. Customise the captions displayed in the landing page slides. Go to `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches\settings_local.py` and edit/add a variable `IMAGE_SLIDES_CAPTIONS`. It is expected to be a 3 element list of strings, where each string is a caption to be displayed in the text box of a slide in the landing page. Example: 
+    ```bash
+    IMAGE_SLIDES_CAPTIONS = [
+        "Thelpousa was an Arcadian polis located approximately 25 km east of ancient Olympia.",
+        "It was situated in the lower Ladon valley, north of the modern village of Toumbitsi.",
+        "The site played an important role in the region's ancient history and landscape."
+    ]
+    ```
 
+4. Customise the email template content. Go to settings_local.py and edit/add a variable EXTRA_EMAIL_CONTEXT. It is expected to be a dictionary with the following keys:
 
-## Step 1 - edit the configuration
+    - *salutation*: The opening greeting string used in the email (e.g., "Hi").
 
-Specify you domain names and contact emails for these domains in the `edit_dot_env` file and then save this file as `.env`:
+    - *expiration*: A string defining how long the activation link remains valid (e.g., "24 hours").
 
-First make an `.env` file
-```bash
-cp edit_dot_env .env
-```
+    - *arches_project_name*: The title of your project instance. Typically maps to the APP_TITLE variable.
 
-Now edit `.env` file to change your settings.
-```bash
-nano .env
-```
+    - *greeting*: The main body text of the email welcoming the user. Wrap this in Django's mark_safe() if you want to include custom HTML formatting or links.
 
+    - *button_text*: The text displayed inside the main call-to-action confirmation button (e.g., "Confirm").
 
-Below are properties to edit to change how Arches deploy. If you want to deploy this on your own machine (localhost), setting `DJANGO_DEBUG=True` is useful to see and diagnose useful error messages in the Arches Django application. Be sure to set `DJANGO_DEBUG=False` for deployments on the public Web. *NOTE* if you run this on your localhost, this Docker build will currently make your Arches application available to your browser via [http://127.0.0.1:8004/](http://127.0.0.1:8004/) *on port 8004*, not the usual 8000. This nonstandard port was chosen in case your local host has other applications already running on port 8000.
+    - *domain_url*: The domain variable (usually maps to _DOMAIN_URL) used to build the activation link.
 
-If you set `BUILD_PRODUCTION=True`, be sure you have well over 8GB of system RAM. `BUILD_PRODUCTION=True` will invoke the Arches `manage.py build_production` command, and this command is *very* resource intensive and time consuming. You will likely get errors that will cause your build to fail if you do a production build on a server with only 8GB of RAM.
+    - *footer_strong_text*: Bolded text representing the institution or project name in the email footer. Wrap in mark_safe() to support HTML entities like &bull;.
 
-```properties
-DJANGO_MODE=DEV
-DJANGO_DEBUG=True
-...
-BUILD_PRODUCTION=False
-```
+    - *footer_additional_text*: Fine print, addresses, or contact details in the footer. Wrap in mark_safe() to support HTML entities like "&middot;".
 
-
-## Step 2 - Build images and start containers
-
-```bash
-docker compose up --build
-```
-
-## Config Changes? - Replace volumes etc to implement changes
-
-Stop the containers:
-
-```bash
-docker compose down
-```
-
-
-## How to Make Arches (administrative) Management Commands
-Currently this will setup an "empty" Arches instance. You'll need to load it with your own data by loading a package or some other approach. Once you deploy Arches, you can use normal Arches management commands as so:
-
-```bash
-docker exec -it arches python manage.py [Arches management commands and arguments here]
-```
-
-
-
-## NOTE
-You may run into weirdness permissions issues restarting the docker container. I solved it with:
-```
-sudo chmod 666 /var/run/docker.sock
-
-```
-
-
-# BACKGROUND AND CREDIT
-This repo will hopefully streamline deployment of Arches for use on the Web. Eventually, we hope to use this as the basis for deploying instances of Arches for use in archaeological teaching and learning applications.
-
-None of this code is very original. This repo started by forking:
-https://github.com/evgeniy-khist/letsencrypt-docker-compose
-
-Some elements of this repo are also derived from:
-https://github.com/opencontext/oc-docker
-
-and
-
-https://github.com/archesproject/arches-for-science-prj
-
-and
-
-https://github.com/archesproject/arches-dependency-containers
-
-and finally
-
-https://github.com/archesproject/arches-her
+    Email template created by us requires providing 2 icons that will be placed in the header and footer of the email. Place the icons in: `{ARCHES_PROJECT}\{ARCHES_PROJECT}\media\img\mailing\footer_logo.png` and `{ARCHES_PROJECT}\{ARCHES_PROJECT}\media\img\mailing\header_logo.png`.
