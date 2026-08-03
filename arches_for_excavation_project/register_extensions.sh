@@ -1,14 +1,16 @@
 #!/bin/bash
 
-echo "=== Starting automatic registration of plugins and reports ==="
+echo "=== Starting automatic registration of plugins, reports, and functions ==="
 
 ARCHES_FOR_EXCAVATION_DIR=$(python -c "import arches_for_excavation, os; print(os.path.dirname(arches_for_excavation.__file__))")
 
 PLUGINS_DIR="${ARCHES_FOR_EXCAVATION_DIR}/plugins"
 REPORTS_DIR="${ARCHES_FOR_EXCAVATION_DIR}/reports"
+FUNCTIONS_DIR="${ARCHES_FOR_EXCAVATION_DIR}/functions"
 
 echo "Using plugins directory: $PLUGINS_DIR"
 echo "Using reports directory: $REPORTS_DIR"
+echo "Using functions directory: $FUNCTIONS_DIR"
 
 # ---------------------------------------------------------
 # 1. Register Plugins
@@ -65,6 +67,36 @@ if [ -d "$REPORTS_DIR" ]; then
     done
 else
     echo "Reports directory not found: $REPORTS_DIR"
+fi
+
+echo "---------------------------------------------------------------"
+
+# ---------------------------------------------------------
+# 3. Register Functions
+# ---------------------------------------------------------
+echo "Checking for functions in: $FUNCTIONS_DIR"
+if [ -d "$FUNCTIONS_DIR" ]; then
+    for function_file in "$FUNCTIONS_DIR"/*.py; do
+        if [ -f "$function_file" ] && [ "$(basename "$function_file")" != "__init__.py" ]; then
+            
+            output=$(python manage.py fn register --source "$function_file" 2>&1)
+            exit_code=$?
+
+            if [ $exit_code -eq 0 ]; then
+                echo "Successfully registered function: $(basename "$function_file")"
+            else
+                if echo "$output" | grep -q 'duplicate key value violates unique constraint'; then
+                    echo "Skipped function (already exists): $(basename "$function_file")"
+                else
+                    echo "Failed to register function: $(basename "$function_file")"
+                    echo "Error details:"
+                    echo "$output"
+                fi
+            fi
+        fi
+    done
+else
+    echo "Functions directory not found: $FUNCTIONS_DIR"
 fi
 
 echo "=== Registration complete ==="
