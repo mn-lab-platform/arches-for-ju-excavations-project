@@ -3,5 +3,7 @@
 *.env
 .env
 /arches/arches_data/packages/
-**/media/img/landing/custom/
-package-lock.json
+**/media/img/landing/custom/*
+**/media/img/email/custom/*
+!**/media/img/landing/custom/.gitkeep
+!**/media/img/email/custom/.gitkeep
