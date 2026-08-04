@@ -72,9 +72,8 @@ Special thanks to [**arches-via-docker**](https://github.com/opencontext/arches-
 1. Change the `.env` variables essential for this section:
     - *APP_TITLE*: The name displayed as page title as well as in the landing page header. Default: `Arches for Excavation`.
     - *EXCAVATION_NAME*: Name of the specific excavation site you are setting the Arches instance up for. It will be displayed as the title of the slides in the landing page. Default: `Arches for Excavation`.
-    - *CUSTOM_LANDING_MEDIA*: True/true/False/false; Set to True/true in case you want to provide your own project logo as well as photos for the slides in the landing page.
 
-2. Add your own logo and images for the slides in the landing page. Remember to set the *CUSTOM_LANDING_MEDIA* variable to True/true in your `.env` file. If you did, go to `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches_for_excavation_project\media\img\landing\custom`.
+2. Add your own logo and images for the slides in the landing page. Go to `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches_for_excavation_project\media\img\landing`.
     - Place your logo in `\custom\project_logo.png`.
     - Place your first slide image in `\custom\landing_first.jpg`.
     - Place your second slide image in `\custom\landing_second.jpg`.
@@ -89,17 +88,17 @@ Special thanks to [**arches-via-docker**](https://github.com/opencontext/arches-
     ]
     ```
 
-4. Customise the email template content. Go to settings_local.py and edit/add a variable EXTRA_EMAIL_CONTEXT. It is expected to be a dictionary with the following keys:
+4. Customise the email template content. Go to `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches\settings_local.py` and edit/add a variable EXTRA_EMAIL_CONTEXT. It is expected to be a dictionary with the following keys:
 
     - *salutation*: The opening greeting string used in the email (e.g., "Hi").
 
     - *expiration*: A string defining how long the activation link remains valid (e.g., "24 hours").
 
-    - *arches_project_name*: The title of your project instance. Typically maps to the APP_TITLE variable.
+    - *arches_project_name*: The title of your project instance.
 
     - *greeting*: The main body text of the email welcoming the user. Wrap this in Django's mark_safe() if you want to include custom HTML formatting or links.
 
-    - *button_text*: The text displayed inside the main call-to-action confirmation button (e.g., "Confirm").
+    - *button_text*: The text displayed inside the main confirmation button (e.g., "Confirm").
 
     - *domain_url*: The domain variable (usually maps to _DOMAIN_URL) used to build the activation link.
 
@@ -107,4 +106,10 @@ Special thanks to [**arches-via-docker**](https://github.com/opencontext/arches-
 
     - *footer_additional_text*: Fine print, addresses, or contact details in the footer. Wrap in mark_safe() to support HTML entities like "&middot;".
 
-    Email template created by us requires providing 2 icons that will be placed in the header and footer of the email. Place the icons in: `{ARCHES_PROJECT}\{ARCHES_PROJECT}\media\img\mailing\footer_logo.png` and `{ARCHES_PROJECT}\{ARCHES_PROJECT}\media\img\mailing\header_logo.png`.
+    To add your own header and footer icons to the email template place them in: 
+
+    `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches_for_excavation_project\media\img\email\custom\footer_logo.png`
+
+    and 
+
+    `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches_for_excavation_project\media\img\email\custom\header_logo.png`.
