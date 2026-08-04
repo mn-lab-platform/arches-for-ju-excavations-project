@@ -108,8 +108,8 @@ Special thanks to [**arches-via-docker**](https://github.com/opencontext/arches-
 
     To add your own header and footer icons to the email template place them in: 
 
-    `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches_for_excavation_project\media\img\email\custom\footer_logo.png`
+    `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches_for_excavation_project\media\img\email\custom\email_header.png`
 
     and 
 
-    `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches_for_excavation_project\media\img\email\custom\header_logo.png`.
+    `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches_for_excavation_project\media\img\email\custom\email_footer.png`.
