@@ -71,16 +71,46 @@ else
 fi
 
 if [ -n "${TMP_DIR}" ]; then
+    RESTORE_SOURCE="${TMP_DIR}"
+
+    # Legacy backups may contain an extra uploadedfiles/ directory. In those
+    # archives the nested copy is the complete one; copying TMP_DIR directly
+    # would create uploadedfiles/uploadedfiles in the shared volume.
+    if [ -d "${TMP_DIR}/uploadedfiles" ]; then
+        echo "Legacy backup layout detected: using nested uploadedfiles/ as archive root"
+        RESTORE_SOURCE="${TMP_DIR}/uploadedfiles"
+    else
+        echo "Flat backup layout detected"
+    fi
+
+    if [ ! -d "${RESTORE_SOURCE}" ]; then
+        echo "ERROR: uploads restore source does not exist: ${RESTORE_SOURCE}"
+        exit 1
+    fi
+
+    echo "Restore source top-level:"
+    ls -lah "${RESTORE_SOURCE}" | head -n 30
+
     echo "[2/5] Restoring uploads into shared uploads volume via Arches: ${ARCHES_CONTAINER}:${ARCHES_UPLOADS_DIR}"
     docker exec -u 0 "${ARCHES_CONTAINER}" sh -lc "mkdir -p '${ARCHES_UPLOADS_DIR}' && find '${ARCHES_UPLOADS_DIR}' -mindepth 1 -maxdepth 1 -exec rm -rf {} +"
-    docker cp "${TMP_DIR}/." "${ARCHES_CONTAINER}:${ARCHES_UPLOADS_DIR}"
+    docker cp "${RESTORE_SOURCE}/." "${ARCHES_CONTAINER}:${ARCHES_UPLOADS_DIR}"
     echo "Fixing permissions inside container..."
-    docker exec -u 0 "${ARCHES_CONTAINER}" sh -lc "chown -R arches:arches '${ARCHES_UPLOADS_DIR}' || chmod -R 777 '${ARCHES_UPLOADS_DIR}'"
+    docker exec -u 0 "${ARCHES_CONTAINER}" sh -lc "chmod -R u+rwX,go+rX '${ARCHES_UPLOADS_DIR}'"
+
+    if docker exec "${ARCHES_CONTAINER}" test -d "${ARCHES_UPLOADS_DIR}/uploadedfiles"; then
+        echo "ERROR: nested uploadedfiles/uploadedfiles detected after restore"
+        exit 1
+    fi
+
     echo "Arches uploadedfiles after copy (top-level):"
     docker exec "${ARCHES_CONTAINER}" sh -lc "ls -lah '${ARCHES_UPLOADS_DIR}' | head -n 30"
     if [ "${TITILER_AVAILABLE}" = true ]; then
         echo "TiTiler /data after copy (top-level):"
         docker exec "${TITILER_CONTAINER}" sh -lc "ls -lah '${TITILER_UPLOADS_DIR}' | head -n 30"
+        if docker exec "${TITILER_CONTAINER}" test -d "${TITILER_UPLOADS_DIR}/uploadedfiles"; then
+            echo "ERROR: TiTiler sees an unexpected /data/uploadedfiles directory"
+            exit 1
+        fi
     fi
 else
     echo "[2/5] Skipping uploads restore (no uploads archive)"

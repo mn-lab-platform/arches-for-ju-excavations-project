@@ -102,9 +102,9 @@ services:
     volumes:
       - arches-log:/web_root/logs
       - arches-static:/static_root
-      - uploads:/arches_app/${ARCHES_PROJECT}/uploadedfiles   
+      - uploads:/arches_app/${ARCHES_PROJECT}/${ARCHES_PROJECT}/uploadedfiles
       - ../arches_data/:/arches_data
-      # - ../arches-app/arches_for_excavation:/opt/venv/lib/python3.13/site-packages/arches_for_excavation
+      - ../arches-for-excavation-application/arches_for_excavation:/opt/venv/lib/python3.13/site-packages/arches_for_excavation
     networks:
       - arches_for_excavation_net
 

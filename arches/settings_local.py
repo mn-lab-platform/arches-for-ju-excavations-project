@@ -18,7 +18,33 @@ def get_optional_env_variable(var_name):
         return os.environ[var_name]
     except KeyError:
         return None
+from .settings import (
+    APP_ROOT,
+    INSTALLED_APPS,
+    STATICFILES_DIRS,
+    TEMPLATES,
+    UPLOADED_FILES_DIR,
+)
 
+RASTER_DATA_DIR = os.path.join(
+    APP_ROOT,
+    UPLOADED_FILES_DIR,
+    "iiif_raster",
+)
+
+TITILER_DATA_MOUNT = "/data"
+
+IIIF_GEOTIFF_META_DIR = os.path.join(
+    APP_ROOT,
+    UPLOADED_FILES_DIR,
+    "iiif_geotiff_meta",
+)
+
+IIIF_RAW_DEM_DIR = os.path.join(
+    APP_ROOT,
+    UPLOADED_FILES_DIR,
+    "iiif_raw_dem",
+)
 MODE = get_env_variable("DJANGO_MODE")
 DEBUG = ast.literal_eval(get_env_variable("DJANGO_DEBUG"))
 DEPLOY_HOST = get_env_variable("DEPLOY_HOST")
