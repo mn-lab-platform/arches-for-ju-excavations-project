@@ -12,3 +12,12 @@
 😭😭😭Podczas npm run build_development
 [webpack-cli] Error: EACCES: permission denied, unlink '/arches_app/arches_for_excavation/arches_for_excavation/media/build/cesium/Assets/Textures/maki/hospital.png'
 - wywołać jeszcze raz run build_development 🤯
+
+😭😭😭 NIE WYŚWIETLAJA SIĘ CONTEXTY CZY INNE RESOURCE NA PAMIE WTEDY:
+-sudo docker compose exec arches bash
+-python manage.py shell
+from django.db import connection
+
+with connection.cursor() as cursor:
+    cursor.execute("SELECT refresh_geojson_geometries();")
+    print(cursor.fetchone())
