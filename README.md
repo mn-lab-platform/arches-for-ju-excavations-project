@@ -2,7 +2,7 @@
 
 The official Docker configuration for deploying the [**Arches for Excavation Application**](<LINK_TO_APP_REPO>). 
 
-This deployment stack, alongside the core application, was built by the [**Mare Nostrum Lab (Jagiellonian University in Kraków, Poland)**](https://mare.id.uj.edu.pl/pl) and is powered by the [**Arches Project**](https://www.archesproject.org/). 
+This deployment stack, alongside the core application, was developed as part of the [**Mare Nostrum Lab (Jagiellonian University in Kraków, Poland)**](https://mare.id.uj.edu.pl/pl) and is powered by the [**Arches Project**](https://www.archesproject.org/). 
 
 Special thanks to [**arches-via-docker**](https://github.com/opencontext/arches-via-docker) for the foundational Docker configurations used in this project.
 
