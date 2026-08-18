@@ -114,8 +114,8 @@ start_celery_supervisor() {
 	echo ""
 	echo "----- START CELERY SUPERVISOR -----"
 	echo ""
-	echo "Sleep 60s in the hope that arches_redis will be fully up and running..."
-	sleep 60s;
+	echo "Sleep 30s in the hope that arches_redis will be fully up and running..."
+	sleep 30s;
 	if [ -f "/tmp/supervisor.sock" ]; then
 		echo "The celery supervisor seems started, so why try to start it again? "
 	else
@@ -200,90 +200,32 @@ run_collect_static_nocheck() {
 	echo "---------------------------------------------------------------"
 }
 
-run_build_production() {
-	echo ""
-	echo "----- RUNNING BUILD PRODUCTION -----"
-	echo ""
-	if [[ ${BUILD_PRODUCTION} == 'True' ]]; then
-		# NOTE: Only do this if you have more than 8GB of system RAM. This will likely error out
-		# otherwise.
-		cd ${APP_FOLDER}
-		exec sh -c "npm run build_development"
-	else
-		echo "Skipping buildproduction because BUILD_PRODUCTION is not 'True' "
-	fi
-	echo "---------------------------------------------------------------"
-}
-
-
 run_setup_arches_setup_webpack() {
-	if [[ ! -d ${STATIC_JS} ]] || [[ ! "$(ls ${STATIC_JS})" ]]; then
-		cd ${APP_FOLDER}
-		echo "Starting Django development server" 
-		python manage.py runserver 0.0.0.0:8000 &
-		echo "Running npm build and collectstatic" 
-		npm run build_development && python manage.py collectstatic --noinput
-	else
-		echo "Webpack and Collectstatic for setup already completed.";
-	fi
+    if [[ ! -d ${STATIC_JS} ]] || [[ ! "$(ls ${STATIC_JS})" ]]; then
+        cd ${APP_FOLDER}
+        echo "Starting Django development server" 
+        python manage.py runserver 0.0.0.0:8000 &
+        
+        if [[ ${BUILD_PRODUCTION} == 'True' ]]; then
+            echo "Running npm PRODUCTION build and collectstatic" 
+            npm run build_production && python manage.py collectstatic --noinput
+        else
+            echo "Running npm DEVELOPMENT build and collectstatic" 
+            npm run build_development && python manage.py collectstatic --noinput
+        fi
+    else
+        echo "Webpack and Collectstatic for setup already completed.";
+    fi
 
-	RUNSERVER_PID=$(pgrep -f "manage.py runserver") 
-	if [ -n "$RUNSERVER_PID" ]; then 
-		echo "Killing manage.py runserver process with PID $RUNSERVER_PID" 
-		kill -9 $RUNSERVER_PID
-		echo "Process $RUNSERVER_PID killed" 
-	else 
-		echo "No manage.py runserver process found"
-	fi
-	
+    RUNSERVER_PID=$(pgrep -f "manage.py runserver") 
+    if [ -n "$RUNSERVER_PID" ]; then 
+        echo "Killing manage.py runserver process with PID $RUNSERVER_PID" 
+        kill -9 $RUNSERVER_PID
+        echo "Process $RUNSERVER_PID killed" 
+    else 
+        echo "No manage.py runserver process found"
+    fi
 }
-
-
-run_webpack() {
-	echo ""
-	echo "----- *** RUNNING WEBPACK SERVER *** -----"
-	echo ""
-	if [[ ${BUILD_PRODUCTION} == 'True' ]]; then
-		# NOTE: Only do this if you have more than 8GB of system RAM. This will likely error out
-		# otherwise.
-		echo "Running Webpack, hopefully the build_production thing will work!"
-		cd ${APP_FOLDER}
-		exec sh -c "npm run build_production"
-	else
-		cd ${APP_FOLDER}
-		echo "Do build_development."
-		echo "Running Webpack to do the NPM build_development thing."
-		exec sh -c "npm run build_development && python manage.py collectstatic --noinput"
-	fi
-}
-
-
-run_setup_webpack() {
-	# NOTE: We're deprecating this in favor of run_setup_arches_setup_webpack.
-	echo ""
-	echo "----- *** RUNNING WEBPACK SERVER FOR SETUP *** -----"
-	echo ""
-	echo "Check if the Arches app responds to http requests..."
-	while [[ ! ${return_code} == 0 ]]
-    do
-        curl -s "http://arches:8000" >&/dev/null
-        return_code=$?
-        sleep 5
-    done
-	echo "Arches app is now responding to http requests!"
-	sleep 5
-	# We're going to first check to see if we have anythin in the static_root/js folder.
-	# If we do, then we've run this already and can skip webpack and collect static.
-	if [[ ! -d ${STATIC_JS} ]] || [[ ! "$(ls ${STATIC_JS})" ]]; then
-		echo "We (apparently) have yet to run webpack and collectstatic. Do it now!";
-		run_webpack
-
-	else
-		echo "Webpack and Collectstatic for setup already completed.";
-		# exec sh -c "python manage.py collectstatic --noinput"
-	fi
-}
-
 
 run_list_static() {
 	echo ""
@@ -322,7 +264,7 @@ run_load_package() {
 
 run_django_server() {
 	echo ""
-	echo "----- *** RUNNING DJANGO DEVELOPMENT SERVER *** -----"
+	echo "----- *** RUNNING DJANGO SERVER *** -----"
 	echo ""
 	sleep 5
 	cd ${APP_FOLDER}
@@ -414,15 +356,6 @@ do
             wait_for_db
             run_setup_admin_password
         ;;
-		run_setup_webpack)
-			run_setup_webpack
-		;;
-		run_webpack)
-			run_webpack
-		;;
-		run_build_production)
-			run_build_production
-		;;
 		setup_arches)
 			start_celery_supervisor
 			wait_for_db
