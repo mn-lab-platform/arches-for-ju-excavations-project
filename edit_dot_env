@@ -1,7 +1,7 @@
 # Edit this file and save as ".env" for use.
 
 COMPOSE_PROJECT_NAME=arches_for_excavation_project
-TZ=PST
+TZ=Europe/Warsaw
 
 #arches project and paths
 ARCHES_PROJECT=arches_for_excavation_project
