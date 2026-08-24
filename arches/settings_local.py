@@ -51,7 +51,7 @@ DEPLOY_HOST = get_env_variable("DEPLOY_HOST")
 DOMAIN_NAMES = get_env_variable("DOMAIN_NAMES").split()
 is_localhost = any(host in ['localhost', '127.0.0.1', '0.0.0.0'] for host in DOMAIN_NAMES)
 APP_NAME = get_env_variable("ARCHES_PROJECT")
-
+TIME_ZONE = get_optional_env_variable("TZ") or "Europe/Warsaw"
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     if not is_localhost:
