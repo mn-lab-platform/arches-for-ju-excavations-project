@@ -72,7 +72,7 @@ EMAIL_PASSWORD='YOUR EMAIL PASSWORD'
 
 # ARCHES FOR EXCAVATION INSTANCE
 ADMIN_PASSWORD=admin
-APP_TITLE="Arches for Excavation"
-EXCAVATION_NAME="Arches for Excavation"
+APP_TITLE="Arches for JU Excavation"
+EXCAVATION_NAME="Arches for JU Excavation"
 
 PAC_WIKIDATA_ENDPOINT='https://pac.cenagis.edu.pl/wiki/sparql'
