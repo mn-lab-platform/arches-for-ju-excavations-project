@@ -293,6 +293,16 @@ run_setup_admin_password() {
     echo "---------------------------------------------------------------"
 }
 
+run_setup_mn_thesaurus_provider() {
+    echo ""
+    echo "----- RUNNING SETUP MN THERAUS PROVIDER -----"
+    echo ""
+    cd ${APP_FOLDER}
+    echo "Registering MN Thesaurus SPARQL Provider..."
+    python3 manage.py setup_mn_thesaurus_provider
+    echo "---------------------------------------------------------------"
+}
+
 #### Main commands
 run_arches() {
 	init_arches
@@ -301,6 +311,7 @@ run_arches() {
 	start_celery_supervisor
 	run_setup_arches_setup_webpack
 	run_setup_admin_password
+	run_setup_mn_thesaurus_provider
 	run_django_server
 }
 
@@ -356,6 +367,10 @@ do
             wait_for_db
             run_setup_admin_password
         ;;
+		run_setup_mn_thesaurus_provider)
+			wait_for_db
+			run_setup_mn_thesaurus_provider
+		;;
 		setup_arches)
 			start_celery_supervisor
 			wait_for_db
