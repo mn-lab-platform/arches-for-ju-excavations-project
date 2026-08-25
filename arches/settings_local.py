@@ -135,7 +135,7 @@ LANGUAGES = [
 ]
 SHOW_LANGUAGE_SWITCH = False
 
-APP_TITLE = get_optional_env_variable("APP_TITLE") or "Arches for Excavation"
+APP_TITLE = get_optional_env_variable("APP_TITLE") or "Arches for JU Excavation"
 _DOMAIN_URL = f"https://{DEPLOY_HOST}"
 
 DEFAULT_FROM_EMAIL = get_optional_env_variable("DEFAULT_FROM_EMAIL") or "xxxx@xxx.com"
@@ -164,8 +164,17 @@ EXTRA_EMAIL_CONTEXT = {
     "footer_additional_text": mark_safe("Gołębia 11 &middot; 31-007 Kraków &middot; Poland")
 }
 
-IMAGE_SLIDES_CAPTIONS = [
-    "To edit this caption, please check the manual.",
-    "To edit this caption, please check the manual.",
-    "To edit this caption, please check the manual."
+LANDING_IMAGE_SLIDES_CONFIG = [
+    {
+        "caption": "Arches for JU Excavations - To edit this caption, image and attribution, please check the manual.",
+        "image_attribution": "Collegium Novum. Photo by Swifteye"
+    },
+    {
+        "caption": "Arches for JU Excavations - To edit this caption, image and attribution, please check the manual.",
+        "image_attribution": "Assembly Hall, Collegium Novum. Photo by Anna Wojnar"
+    },
+    {
+        "caption": "Arches for JU Excavations - To edit this caption, image and attribution, please check the manual.",
+        "image_attribution": "Main Square, Kraków. Photo by Swifteye"
+    }
 ]
