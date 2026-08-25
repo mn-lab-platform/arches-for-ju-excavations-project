@@ -1,12 +1,12 @@
-# Arches for Excavation (Docker Deployment)
+# Arches for JU Excavations (Docker Deployment)
 
-The official Docker configuration for deploying the [**Arches for Excavation Application**](<LINK_TO_APP_REPO>). 
+The official Docker configuration for deploying the [**Arches for JU Excavations Application**](https://github.com/Mare-Nostrum-Lab-UJ/arches-for-ju-excavations). 
 
-This deployment stack, alongside the core application, was developed as part of the [**Mare Nostrum Lab (Jagiellonian University in Kraków, Poland)**](https://mare.id.uj.edu.pl/pl) and is powered by the [**Arches Project**](https://www.archesproject.org/). 
+This deployment stack, alongside the core application, was developed as part of the [**Mare Nostrum LAB Platform**](https://mn.cenagis.edu.pl) and is powered by the [**Arches Project**](https://www.archesproject.org). 
 
 Special thanks to [**arches-via-docker**](https://github.com/opencontext/arches-via-docker) for the foundational Docker configurations used in this project.
 
-## Setting Up Arches for Excavation on Your Machine
+## Setting Up Arches for JU Excavations on Your Machine
 1. Clone this repository.
     ```bash
     git clone https://gitlab.cenagis.edu.pl/uavgeolab/mare-nostrum/arches-for-excavation-project.git
@@ -20,7 +20,7 @@ Special thanks to [**arches-via-docker**](https://github.com/opencontext/arches-
     - *DEPLOY_HOST*: The main domain name where your Arches instance will be accessible (e.g., arches.example.com).
     - *DOMAIN_NAMES*: A space-separated list of all domains and IPs that should resolve to your Arches instance (e.g., arches.example.com localhost 127.0.0.1).
     - *DJANGO_DEBUG*: True/true/False/false. Setting this option to True/true is useful during development, however for production-ready environments, it must strictly be set to False/false.
-    - *ADMIN_USERNAME*: Superuser login that you will use to log into your Arches for Excavation instance, as well as the admin panel in the browser.
+    - *ADMIN_USERNAME*: Superuser login that you will use to log into your Arches for JU Excavations instance, as well as the admin panel in the browser.
     - *ADMIN_PASSWORD*: Password for the superuser account described above.
 4. Make sure you are on the default branch called **main**. If you are, start your Arches Project instance: 
     ```bash
@@ -30,10 +30,7 @@ Special thanks to [**arches-via-docker**](https://github.com/opencontext/arches-
 
      **If you encounter any issues** when trying to access your Arches instance in the browser, it is recommended to execute the following commands:
     ```bash
-    docker exec -it arches npm install
-    ```
-    ```bash
-    docker exec -it arches npm run build_development
+    docker exec -it arches npm run build_production
     ```
     ```bash
     docker exec -it arches python manage.py collectstatic --noinput --verbosity 2
@@ -44,12 +41,12 @@ Special thanks to [**arches-via-docker**](https://github.com/opencontext/arches-
     docker compose restart
     ```
 
-6. Register all Arches for Excavation custom reports, plugins and functions in your instance:
+6. Register all Arches for JU Excavations custom reports, plugins and functions in your instance:
     ```bash
     docker exec -it arches ./register_extensions.sh
     ```
 
-7. Import all Arches for Excavation ontology and resource models into your instance:
+7. Import all Arches for JU Excavations ontology and resource models into your instance:
     ```bash
     docker exec -it arches python manage.py packages -o load_package -a arches_for_excavation -y
     ```
@@ -68,10 +65,10 @@ Special thanks to [**arches-via-docker**](https://github.com/opencontext/arches-
     docker compose restart
     ```
 
-## Customizing Your Arches for Excavation
+## Customizing Your Arches for JU Excavations
 1. Change the `.env` variables essential for this section:
-    - *APP_TITLE*: The name displayed as page title as well as in the landing page header. Default: `Arches for Excavation`.
-    - *EXCAVATION_NAME*: Name of the specific excavation site you are setting the Arches instance up for. It will be displayed as the title of the slides in the landing page. Default: `Arches for Excavation`.
+    - *APP_TITLE*: The name displayed as page title as well as in the landing page header. Default: `Arches for JU Excavations`.
+    - *EXCAVATION_NAME*: Name of the specific excavation site you are setting the Arches instance up for. It will be displayed as the title of the slides in the landing page. Default: `Arches for JU Excavations`.
 
 2. Add your own logo and images for the slides in the landing page. Go to `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches_for_excavation_project\media\img\landing`.
     - Place your logo in `\custom\project_logo.png`.
@@ -79,12 +76,21 @@ Special thanks to [**arches-via-docker**](https://github.com/opencontext/arches-
     - Place your second slide image in `\custom\landing_second.jpg`.
     - Place your third slide image in `\custom\landing_third.jpg`.
 
-3. Customise the captions displayed in the landing page slides. Go to `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches\settings_local.py` and edit/add a variable `IMAGE_SLIDES_CAPTIONS`. It is expected to be a 3 element list of strings, where each string is a caption to be displayed in the text box of a slide in the landing page. Example: 
+3. Customise the captions and attributions displayed in the landing page slides. Go to `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches\settings_local.py` and edit/add a variable `LANDING_IMAGE_SLIDES_CONFIG`. It is expected to be a 3 element list of dictionaries, where each dictionary contains 2 key-value pairs. The first one is a caption to be displayed in the text box of a slide in the landing page, and the other is the attribution of the image in the slide. Example: 
     ```bash
-    IMAGE_SLIDES_CAPTIONS = [
-        "Thelpousa was an Arcadian polis located approximately 25 km east of ancient Olympia.",
-        "It was situated in the lower Ladon valley, north of the modern village of Toumbitsi.",
-        "The site played an important role in the region's ancient history and landscape."
+    LANDING_IMAGE_SLIDES_CONFIG = [
+        {
+            "caption": "Arches for JU Excavations - To edit this caption, image and attribution, please check the manual.",
+            "image_attribution": "Collegium Novum. Photo by Swifteye"
+        },
+        {
+            "caption": "Arches for JU Excavations - To edit this caption, image and attribution, please check the manual.",
+            "image_attribution": "Assembly Hall, Collegium Novum. Photo by Anna Wojnar"
+        },
+        {
+            "caption": "Arches for JU Excavations - To edit this caption, image and attribution, please check the manual.",
+            "image_attribution": "Main Square, Kraków. Photo by Swifteye"
+        }
     ]
     ```
 

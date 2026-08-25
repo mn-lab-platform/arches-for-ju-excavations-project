@@ -29,3 +29,22 @@ docker exec -it arches tail -f /var/log/celery/worker.log
 docker exec -it arches python manage.py shell -c "from django.apps import apps; [print(f'{m._meta.app_label}.{m.__name__}') for m in apps.get_models()]"
 
 docker exec -it arches python manage.py shell -c "from django.core.cache import cache; cache.clear()"
+
+saved-searches.js:17  GET http://localhost:8004/search_component_data/saved-searches 500 (Internal Server Error):
+- in settings_local.py add SAVED_SEARCHES = []
+- docker exec -it arches python manage.py es reindex_database
+
+sh: 1: eslint: not found
+- docker exec -it arches npm install
+
+Unable to save. NotFoundError(404, "{'_index': 'arches_for_excavation_concepts', '_id': 'ac41d9be-79db-4256-b368-2f4559cfbe55', 'found': False}")
+- docker exec -it arches python manage.py es index_concepts
+
+Problems with displaying resources geometry in search map
+-sudo docker compose exec arches bash
+-python manage.py shell
+from django.db import connection
+
+with connection.cursor() as cursor:
+    cursor.execute("SELECT refresh_geojson_geometries();")
+    print(cursor.fetchone())
