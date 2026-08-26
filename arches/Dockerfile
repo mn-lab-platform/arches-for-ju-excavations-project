@@ -69,7 +69,6 @@ ARG ARCHES_PROJECT
 ARG APP_ROOT
 ARG APP_COMP_FOLDER
 ARG UPLOADED_FILES_FOLDER
-ARG GITLAB_TOKEN
 
 # settings_local.py provides the DB credentials, etc. to the Arches project.
 ENV SETTINGS_PATH=${APP_COMP_FOLDER}/settings.py
@@ -176,7 +175,7 @@ RUN pip install supervisor \
     && pip install pyvips \
     && pip install numpy==2.4.2 \
     && pip install "djangorestframework>=3.14.0" \
-    && pip install --no-cache-dir git+https://oauth2:${GITLAB_TOKEN}@gitlab.cenagis.edu.pl/uavgeolab/mare-nostrum/arches-for-excavation-application.git
+    && pip install --no-cache-dir git+https://github.com/Mare-Nostrum-Lab-UJ/arches-for-ju-excavations.git
 
 # create a new Arches project
 RUN mkdir -p /new_arches_proj

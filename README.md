@@ -20,7 +20,6 @@ Special thanks to the original creators of [**arches-via-docker**](https://githu
     - *DEPLOY_HOST*: The main domain name where your Arches instance will be accessible (e.g., arches.example.com).
     - *DOMAIN_NAMES*: A space-separated list of all domains and IPs that should resolve to your Arches instance (e.g., arches.example.com localhost 127.0.0.1).
     - *DJANGO_DEBUG*: True/true/False/false. Setting this option to True/true is useful during development, however for production-ready environments, it must strictly be set to False/false.
-    - *ADMIN_USERNAME*: Superuser login that you will use to log into your Arches for JU Excavations instance, as well as the admin panel in the browser.
     - *ADMIN_PASSWORD*: Password for the superuser account described above.
 4. Make sure you are on the default branch called **main**. If you are, start your Arches Project instance: 
     ```bash
