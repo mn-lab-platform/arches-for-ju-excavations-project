@@ -4,7 +4,7 @@ The official Docker configuration for deploying the [**Arches for JU Excavations
 
 This deployment stack, alongside the core application, was developed as part of the [**Mare Nostrum LAB Platform**](https://mn.cenagis.edu.pl) and is powered by the [**Arches Project**](https://www.archesproject.org). 
 
-Special thanks to the original creators of [**arches-via-docker**](https://github.com/opencontext/arches-via-docker) (credited in the contributors sidebar) for the foundational Docker configurations used in this project.
+Special thanks to the original creators of [**arches-via-docker**](https://github.com/opencontext/arches-via-docker) for the foundational Docker configurations used in this project.
 
 ## Setting Up Arches for JU Excavations on Your Machine
 1. Clone this repository.
