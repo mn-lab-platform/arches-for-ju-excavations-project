@@ -1,6 +1,6 @@
 # Arches for JU Excavations (Docker Deployment)
 
-The official Docker configuration for deploying the [**Arches for JU Excavations Application**](https://github.com/Mare-Nostrum-Lab-UJ/arches-for-ju-excavations). 
+The official Docker configuration for deploying the [**Arches for JU Excavations Application**](https://github.com/mn-lab-platform/arches-for-ju-excavations). 
 
 This deployment stack, alongside the core application, was developed as part of the [**Mare Nostrum LAB Platform**](https://mn.cenagis.edu.pl) and is powered by the [**Arches Project**](https://www.archesproject.org). 
 
@@ -9,7 +9,7 @@ Special thanks to the original creators of [**arches-via-docker**](https://githu
 ## Setting Up Arches for JU Excavations on Your Machine
 1. Clone this repository.
     ```bash
-    git clone https://github.com/Mare-Nostrum-Lab-UJ/arches-for-ju-excavations-project.git
+    git clone https://github.com/mn-lab-platform/arches-for-ju-excavations-project.git
     ```
 2. Create an .env file in the root of the cloned codebase, by copying the `edit_dot_env` file: 
     ``` bash
