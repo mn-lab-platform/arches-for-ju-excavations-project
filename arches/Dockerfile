@@ -175,7 +175,7 @@ RUN pip install supervisor \
     && pip install pyvips \
     && pip install numpy==2.4.2 \
     && pip install "djangorestframework>=3.14.0" \
-    && pip install --no-cache-dir git+https://github.com/Mare-Nostrum-Lab-UJ/arches-for-ju-excavations.git
+    && pip install --no-cache-dir git+https://github.com/mn-lab-platform/arches-for-ju-excavations.git
 
 # create a new Arches project
 RUN mkdir -p /new_arches_proj

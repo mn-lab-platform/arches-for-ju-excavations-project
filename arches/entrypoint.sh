@@ -201,7 +201,7 @@ run_collect_static_nocheck() {
 }
 
 run_setup_arches_setup_webpack() {
-    if [[ ! -d ${STATIC_JS} ]] || [[ ! "$(ls ${STATIC_JS})" ]]; then
+    if [[ ! -f ${WEBPACK_STATS_PATH} ]] || [[ ! -d ${STATIC_JS} ]] || [[ ! "$(ls ${STATIC_JS})" ]]; then
         cd ${APP_FOLDER}
         echo "Starting Django development server" 
         python manage.py runserver 0.0.0.0:8000 &
@@ -303,6 +303,16 @@ run_setup_mn_thesaurus_provider() {
     echo "---------------------------------------------------------------"
 }
 
+run_create_custom_auth_groups() {
+	echo ""
+	echo "----- RUNNING CREATE CUSTOM AUTH GROUPS -----"
+	echo ""
+	cd ${APP_FOLDER}
+	echo "Creating custom authentication groups..."
+	python3 manage.py create_custom_auth_groups
+	echo "---------------------------------------------------------------"
+}
+
 #### Main commands
 run_arches() {
 	init_arches
@@ -311,6 +321,7 @@ run_arches() {
 	start_celery_supervisor
 	run_setup_arches_setup_webpack
 	run_setup_admin_password
+	run_create_custom_auth_groups
 	run_setup_mn_thesaurus_provider
 	run_django_server
 }
@@ -367,6 +378,10 @@ do
             wait_for_db
             run_setup_admin_password
         ;;
+		run_create_custom_auth_groups)
+			wait_for_db
+			run_create_custom_auth_groups
+		;;
 		run_setup_mn_thesaurus_provider)
 			wait_for_db
 			run_setup_mn_thesaurus_provider
