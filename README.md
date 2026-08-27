@@ -9,7 +9,7 @@ Special thanks to the original creators of [**arches-via-docker**](https://githu
 ## Setting Up Arches for JU Excavations on Your Machine
 1. Clone this repository.
     ```bash
-    git clone https://gitlab.cenagis.edu.pl/uavgeolab/mare-nostrum/arches-for-excavation-project.git
+    git clone https://github.com/Mare-Nostrum-Lab-UJ/arches-for-ju-excavations-project.git
     ```
 2. Create an .env file in the root of the cloned codebase, by copying the `edit_dot_env` file: 
     ``` bash
