@@ -111,10 +111,5 @@ Special thanks to the original creators of [**arches-via-docker**](https://githu
 
     - *footer_additional_text*: Fine print, addresses, or contact details in the footer. Wrap in mark_safe() to support HTML entities like "&middot;".
 
-    To add your own header and footer icons to the email template place them in: 
-
-    `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches_for_excavation_project\media\img\email\custom\email_header.png`
-
-    and 
-
-    `<DIR_YOU_CLONED_THIS_REPO_INTO>\arches_for_excavation_project\media\img\email\custom\email_footer.png`.
+    - *email_header_image_url*: Path to the icon that should be placed in the email header.
+    - *email_footer_image_url*: Path to the icon that should be placed in the email footer.

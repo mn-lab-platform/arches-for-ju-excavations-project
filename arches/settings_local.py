@@ -18,6 +18,7 @@ def get_optional_env_variable(var_name):
         return os.environ[var_name]
     except KeyError:
         return None
+
 from .settings import (
     APP_ROOT,
     INSTALLED_APPS,
@@ -161,7 +162,9 @@ EXTRA_EMAIL_CONTEXT = {
     "button_text": "Confirm",
     "domain_url": _DOMAIN_URL,
     "footer_strong_text": mark_safe("Institute of Archaeology &bull; Jagiellonian University"),
-    "footer_additional_text": mark_safe("Gołębia 11 &middot; 31-007 Kraków &middot; Poland")
+    "footer_additional_text": mark_safe("Gołębia 11 &middot; 31-007 Kraków &middot; Poland"),
+    "email_header_image_url": 'img/email/default/email_header.png',
+    "email_footer_image_url": 'img/email/default/email_footer.png'
 }
 
 LANDING_IMAGE_SLIDES_CONFIG = [
