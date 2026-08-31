@@ -20,6 +20,7 @@ Special thanks to the original creators of [**arches-via-docker**](https://githu
     - *DEPLOY_HOST*: The main domain name where your Arches instance will be accessible (e.g., arches.example.com).
     - *DOMAIN_NAMES*: A space-separated list of all domains and IPs that should resolve to your Arches instance (e.g., arches.example.com localhost 127.0.0.1).
     - *DJANGO_DEBUG*: True/true/False/false. Setting this option to True/true is useful during development, however for production-ready environments, it must strictly be set to False/false.
+    - *BUILD_PRODUCTION*: Set to `False` for normal local development. When enabled, it tells the Docker build to compile the frontend in production mode for a production-ready bundle, which uses more memory and may fail on machines with less than ~8GB of RAM.
     - *ADMIN_PASSWORD*: Password for the superuser account described above.
 4. Make sure you are on the default branch called **main**. If you are, start your Arches Project instance: 
     ```bash
@@ -27,30 +28,23 @@ Special thanks to the original creators of [**arches-via-docker**](https://githu
     ```
     Feel free to go grab yourself a coffee, it might take a while :).
 
-     **If you encounter any issues** when trying to access your Arches instance in the browser, it is recommended to execute the following commands:
-    ```bash
-    docker exec -it arches npm run build_production
-    ```
-    ```bash
-    docker exec -it arches python manage.py collectstatic --noinput --verbosity 2
-    ```
-
-    If the problem persists after executing those commands, run:
-    ```bash
-    docker compose restart
-    ```
 
 6. Register all Arches for JU Excavations custom reports, plugins and functions in your instance:
     ```bash
     docker exec -it arches ./register_extensions.sh
     ```
 
-7. Import all Arches for JU Excavations ontology and resource models into your instance:
+7. Grant access to the configured plugins and workflows for the Plugin Access group:
+    ```bash
+    docker exec -it arches python manage.py assign_plugin_permissions
+    ```
+
+8. Import all Arches for JU Excavations ontology and resource models into your instance:
     ```bash
     docker exec -it arches python manage.py packages -o load_package -a arches_for_excavation -y
     ```
 
-8. (Optional) Set up mailing backend for your arches instance, to do so overwrite variables listed below inside your `.env` file:
+9. (Optional) Set up mailing backend for your arches instance, to do so overwrite variables listed below inside your `.env` file:
     - *EMAIL_PASSWORD*: Password for your email server. **If your password contains special characters (like '$'), wrap it in single quotes to avoid issues with Docker/Python parsing**.
     - *DEFAULT_FROM_EMAIL*: The display name and email address that will appear as the sender (e.g., <noreply@arches.example.com>').
     - *EMAIL_USE_TLS*: True/true/False/false
