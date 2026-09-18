@@ -142,26 +142,49 @@ services:
     environment:
       - TITILER_ALLOW_LOCAL=true
   
-  # arches_backup_daemon:
-  #   container_name: arches_backup_daemon
-  #   hostname: arches_backup_daemon
-  #   profiles: ["backup"]
-  #   build:
-  #     context: ./backup_daemon
-  #     dockerfile: Dockerfile
-  #   restart: unless-stopped
-  #   env_file:
-  #     - ./.env
-  #   environment:
-  #     - RESTIC_PASSWORD=${RESTIC_PASSWORD}
-  #     - RESTIC_REPOSITORY=/backups
-  #   volumes:
-  #     - uploads:/uploadedfiles
-  #     - ${BACKUPS_DIRECTORY}:/backups
-  #   depends_on:
-  #     - arches_db
-  #   networks:
-  #     - arches_for_excavation_net
+  arches_backup_daemon:
+    container_name: arches_backup_daemon
+    hostname: arches_backup_daemon
+    profiles: ["backup"]
+    build:
+      context: ./backup_daemon
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      - RESTIC_PASSWORD=${RESTIC_PASSWORD}
+      - RESTIC_REPOSITORY=/backups
+    volumes:
+      - uploads:/uploadedfiles
+      - ${BACKUPS_DIRECTORY}:/backups
+    depends_on:
+      - arches_db
+    networks:
+      - arches_for_excavation_net
+
+  tus:
+    container_name: tus
+    image: tusproject/tusd:v2
+    env_file:
+      - ./.env
+    restart: unless-stopped
+    ports:
+      - "1080:8080"
+    volumes:
+      - uploads:/data
+    networks:
+      - arches_for_excavation_net
+    command:
+      - "-upload-dir=/data"
+      - "-port=8080"
+      - "-cors-allow-origin=${DEPLOY_HOST}"
+      - "-behind-proxy"
+      - "-disable-download"
+      - "-disable-termination"
+      - "-hooks-http=http://arches:8000/api/webhooks/tusd"
+      - "-hooks-enabled-events=pre-create,post-finish"
+      - "-hooks-http-forward-headers=Cookie"
 
 networks:
   arches_for_excavation_net:
