@@ -276,8 +276,8 @@ run_django_server() {
 		# The GUNICORN_CONFIG_PATH breaks this, (errors in urls.py) so we'll just run it directly
 		# echo "gunicorn ${ARCHES_PROJECT}.wsgi:application --config ${GUNICORN_CONFIG_PATH}"
 		# exec sh -c "gunicorn ${ARCHES_PROJECT}.wsgi:application --config ${GUNICORN_CONFIG_PATH}"
-		echo "gunicorn -w 12 -b 0.0.0.0:${DJANGO_PORT} ${ARCHES_PROJECT}.wsgi:application --timeout 3600"
-		exec sh -c "gunicorn -w 12 -b 0.0.0.0:${DJANGO_PORT} ${ARCHES_PROJECT}.wsgi:application --timeout 3600"
+		echo "gunicorn -w 12 -b 0.0.0.0:${DJANGO_PORT} ${ARCHES_PROJECT}.wsgi:application --reload --timeout 3600"
+		exec sh -c "gunicorn -w 12 -b 0.0.0.0:${DJANGO_PORT} ${ARCHES_PROJECT}.wsgi:application --reload --timeout 3600"
 		# echo "gunicorn -b 0.0.0.0:${DJANGO_PORT} ${ARCHES_PROJECT}.wsgi:application"
 		# exec sh -c "gunicorn -b 0.0.0.0:${DJANGO_PORT} ${ARCHES_PROJECT}.wsgi:application"
 	fi
@@ -313,6 +313,19 @@ run_create_custom_auth_groups() {
 	echo "---------------------------------------------------------------"
 }
 
+run_setup_shared_volumes() {
+    echo ""
+    echo "----- UNLOCKING UPLOAD VOLUME PERMISSIONS FOR TUSD -----"
+    echo ""
+    UPLOAD_DIR="${APP_FOLDER}/${ARCHES_PROJECT}/${ARCHES_PROJECT}/uploadedfiles"
+    
+    mkdir -p ${UPLOAD_DIR}
+    chmod 777 ${UPLOAD_DIR}
+    
+    echo "Permissions set to 777 on ${UPLOAD_DIR}"
+    echo "---------------------------------------------------------------"
+}
+
 #### Main commands
 run_arches() {
 	init_arches
@@ -323,6 +336,7 @@ run_arches() {
 	run_setup_admin_password
 	run_create_custom_auth_groups
 	run_setup_mn_thesaurus_provider
+	run_setup_shared_volumes
 	run_django_server
 }
 
@@ -378,6 +392,7 @@ do
             wait_for_db
             run_setup_admin_password
         ;;
+		run
 		run_create_custom_auth_groups)
 			wait_for_db
 			run_create_custom_auth_groups
