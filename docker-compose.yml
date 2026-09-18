@@ -103,7 +103,7 @@ services:
       - arches-static:/static_root
       - uploads:/arches_app/${ARCHES_PROJECT}/${ARCHES_PROJECT}/uploadedfiles
       - ../arches_data/:/arches_data
-      # - ../arches-for-excavation-application/arches_for_excavation:/opt/venv/lib/python3.13/site-packages/arches_for_excavation
+      - ../arches-for-ju-excavations/arches_for_excavation:/opt/venv/lib/python3.13/site-packages/arches_for_excavation
     networks:
       - arches_for_excavation_net
 
@@ -154,6 +154,29 @@ services:
       - arches_db
     networks:
       - arches_for_excavation_net
+
+  tus:
+    container_name: tus
+    image: tusproject/tusd:v2
+    env_file:
+      - ./.env
+    restart: unless-stopped
+    ports:
+      - "1080:8080"
+    volumes:
+      - uploads:/data
+    networks:
+      - arches_for_excavation_net
+    command:
+      - "-upload-dir=/data"
+      - "-port=8080"
+      - "-cors-allow-origin=${DEPLOY_HOST}"
+      - "-behind-proxy"
+      - "-disable-download"
+      - "-disable-termination"
+      - "-hooks-http=http://arches:8000/api/webhooks/tusd"
+      - "-hooks-enabled-events=pre-create,post-finish"
+      - "-hooks-http-forward-headers=Cookie"
 
 networks:
   arches_for_excavation_net:
