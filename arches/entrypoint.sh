@@ -315,15 +315,21 @@ run_create_custom_auth_groups() {
 
 run_setup_shared_volumes() {
     echo ""
-    echo "----- UNLOCKING UPLOAD VOLUME PERMISSIONS FOR TUSD -----"
+    echo "----- CONFIGURING SHARED VOLUME PERMISSIONS -----"
     echo ""
-    UPLOAD_DIR="${APP_FOLDER}/${ARCHES_PROJECT}/${ARCHES_PROJECT}/uploadedfiles"
+    UPLOAD_DIR=${UPLOADED_FILES_FOLDER}
     
-    mkdir -p ${UPLOAD_DIR}
-    chmod 777 ${UPLOAD_DIR}
-    
-    echo "Permissions set to 777 on ${UPLOAD_DIR}"
-    echo "---------------------------------------------------------------"
+	mkdir -p ${UPLOAD_DIR}
+
+	chown -R :1000 ${UPLOAD_DIR}
+
+	chmod -R 775 ${UPLOAD_DIR}
+
+	chmod -R g+s ${UPLOAD_DIR}
+
+	echo "Shared volume permissions configured for ${UPLOAD_DIR}"
+
+	echo "---------------------------------------------------------------"
 }
 
 #### Main commands
@@ -392,7 +398,9 @@ do
             wait_for_db
             run_setup_admin_password
         ;;
-		run
+		run_setup_shared_volumes)
+			run_setup_shared_volumes
+		;;
 		run_create_custom_auth_groups)
 			wait_for_db
 			run_create_custom_auth_groups
