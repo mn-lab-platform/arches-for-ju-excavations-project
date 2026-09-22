@@ -103,7 +103,7 @@ services:
       - arches-static:/static_root
       - uploads:/arches_app/${ARCHES_PROJECT}/${ARCHES_PROJECT}/uploadedfiles
       - ../arches_data/:/arches_data
-      - ../arches-for-ju-excavations/arches_for_excavation:/opt/venv/lib/python3.13/site-packages/arches_for_excavation
+      # - ../arches-for-ju-excavations/arches_for_excavation:/opt/venv/lib/python3.13/site-packages/arches_for_excavation
     networks:
       - arches_for_excavation_net
 
@@ -162,14 +162,14 @@ services:
       - ./.env
     restart: unless-stopped
     ports:
-      - "1080:8080"
+      - "1080:1080"
     volumes:
       - uploads:/data
     networks:
       - arches_for_excavation_net
     command:
       - "-upload-dir=/data"
-      - "-port=8080"
+      - "-port=1080"
       - "-cors-allow-origin=${DEPLOY_HOST}"
       - "-behind-proxy"
       - "-disable-download"
