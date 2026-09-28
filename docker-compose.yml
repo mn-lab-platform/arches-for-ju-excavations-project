@@ -103,7 +103,11 @@ services:
       - arches-static:/static_root
       - uploads:/arches_app/${ARCHES_PROJECT}/${ARCHES_PROJECT}/uploadedfiles
       - ../arches_data/:/arches_data
+<<<<<<< Updated upstream
       # - ../arches-for-ju-excavations/arches_for_excavation:/opt/venv/lib/python3.13/site-packages/arches_for_excavation
+=======
+      - ../arches-for-ju-excavations/arches_for_excavation:/opt/venv/lib/python3.13/site-packages/arches_for_excavation
+>>>>>>> Stashed changes
     networks:
       - arches_for_excavation_net
 
@@ -173,7 +177,6 @@ services:
       - "-cors-allow-origin=${DEPLOY_HOST}"
       - "-behind-proxy"
       - "-disable-download"
-      - "-disable-termination"
       - "-hooks-http=http://arches:8000/api/webhooks/tusd"
       - "-hooks-enabled-events=pre-create,post-finish"
       - "-hooks-http-forward-headers=Cookie"
