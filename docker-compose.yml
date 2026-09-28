@@ -181,7 +181,6 @@ services:
       - "-cors-allow-origin=${DEPLOY_HOST}"
       - "-behind-proxy"
       - "-disable-download"
-      - "-disable-termination"
       - "-hooks-http=http://arches:8000/api/webhooks/tusd"
       - "-hooks-enabled-events=pre-create,post-finish"
       - "-hooks-http-forward-headers=Cookie"
