@@ -140,6 +140,7 @@ services:
   
   backup_daemon:
     container_name: arches_backup_daemon
+    profiles: ["backup"]
     build:
       context: ./backup_daemon
       dockerfile: Dockerfile
@@ -153,7 +154,6 @@ services:
       - uploads:/uploadedfiles
       - ${BACKUPS_DIRECTORY}:/backups
     depends_on:
-      - arches
       - arches_db
     networks:
       - arches_for_excavation_net
