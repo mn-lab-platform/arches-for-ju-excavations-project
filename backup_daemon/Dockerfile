@@ -18,4 +18,9 @@ RUN chmod +x restore.sh
 COPY crontab /etc/cron.d/backup-arches
 RUN chmod 0644 /etc/cron.d/backup-arches && crontab /etc/cron.d/backup-arches
 
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]
+
 CMD ["cron", "-f"]
