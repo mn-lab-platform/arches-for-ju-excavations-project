@@ -84,19 +84,24 @@ To take advantage of the Backup Daemon you need to perform the following steps:
 
 And just like that Backup Daemon is ready to backup and restore data from your Arches for JU Excavations instance. To backup your data simply execute:
 ```bash
-    docker exec -it -d arches_backup_daemon ./backup.sh
-```
-Similarly to rollback to a specific point in time execute:
-```bash
-    docker exec -it -d arches_backup_daemon ./restore.sh <SNAPSHOT_ID>
+    docker exec -it arches_backup_daemon ./backup.sh
 ```
 
-To access the SNAPSHOT_ID necessary for the restore command to run, execute:
+To rollback to a specific point in time, you must first access the SNAPSHOT_ID. Execute:
 ```bash
     docker exec -it arches_backup_daemon restic snapshots
 ```
 It will return a table with all the information you need. Just copy the ID of the snapshot corresponding to the date you want to rollback your system to. In case the default view doesnt suit your needs - [Explore snapshot filtering and display options](https://restic.readthedocs.io/en/stable/045_working_with_repos.html).
 
+Once you have your SNAPSHOT_ID, execute the restore script. The restore script supports different recovery modes:
+```bash
+    # Usage: ./restore.sh [-y] <SNAPSHOT_ID> [all|db|media]
+    docker exec -it arches_backup_daemon ./restore.sh <SNAPSHOT_ID>
+```
+Restore script modes:
+- *`all`*: Restores both PostgreSQL database and all uploaded media files.
+- *`db`*: Restores only the PostgreSQL database. Useful for quick rollbacks if only application data was corrupted.
+- *`media`*: Restores only the uploaded files directory.
 
 ## Customizing Your Arches for JU Excavations
 1. Change the `.env` variables essential for this section:

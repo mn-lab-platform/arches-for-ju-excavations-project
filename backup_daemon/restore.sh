@@ -8,74 +8,89 @@ set -euo pipefail
 : "${RESTIC_REPOSITORY:?RESTIC_REPOSITORY is required}"
 : "${RESTIC_PASSWORD:?RESTIC_PASSWORD is required}"
 
-if [ -z "${1:-}" ]; then
-  echo "Usage: ./restore.sh <snapshot-id>"
+usage() {
+  echo "Usage: $0 [-y] <snapshot-id> [all|db|media]"
+  echo "  -y        Auto-confirm (non-interactive, safe for 'docker exec -d')"
+  echo "  Modes:    all   - restores both DB and uploadedfiles (default)"
+  echo "            db    - restores only PostgreSQL database"
+  echo "            media - restores only /uploadedfiles"
   exit 1
+}
+
+AUTO_CONFIRM=false
+while getopts "y" opt; do
+  case "$opt" in
+    y) AUTO_CONFIRM=true ;;
+    *) usage ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+if [ -z "${1:-}" ]; then
+  usage
 fi
 
 SNAPSHOT_ID=$1
+MODE="${2:-all}"
+
+if [[ ! "$MODE" =~ ^(all|db|media)$ ]]; then
+  echo "ERROR: Invalid mode '$MODE'. Must be 'all', 'db', or 'media'." >&2
+  exit 1
+fi
 
 if ! restic snapshots > /dev/null 2>&1; then
   echo "ERROR: Restic repository is not initialized or unreachable at ${RESTIC_REPOSITORY}." >&2
   exit 1
 fi
 
-if [ ! -d /uploadedfiles ]; then
+if [[ "$MODE" =~ ^(all|media)$ ]] && [ ! -d /uploadedfiles ]; then
   echo "ERROR: /uploadedfiles is not mounted." >&2
   exit 1
 fi
 
-read -p "Are you sure you want to restore snapshot ${SNAPSHOT_ID}? This action will overwrite both the database and the media files of your Arches application. Proceed? [y/N]: " confirm
-
-if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-  echo "Restore operation cancelled."
-  exit 0
+if [ "$AUTO_CONFIRM" = false ]; then
+  read -p "Are you sure you want to restore snapshot ${SNAPSHOT_ID} (mode: ${MODE})? Proceed? [y/N]: " confirm
+  if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+    echo "Restore operation cancelled."
+    exit 0
+  fi
 fi
 
-TMP_DIR="/tmp/restore_staging_${SNAPSHOT_ID}"
-mkdir -p "${TMP_DIR}"
+if [[ "$MODE" == "all" || "$MODE" == "db" ]]; then
+  echo "=== Restoring database dump... ==="
 
-echo "=== Restoring snapshot from Restic... ==="
-restic --verbose restore "${SNAPSHOT_ID}" --target "${TMP_DIR}"
+  restic restore "${SNAPSHOT_ID}" --target / --include /tmp/current_db.dump
 
-DB_DUMP="${TMP_DIR}/tmp/current_db.dump"
-RESTORE_SOURCE="${TMP_DIR}/uploadedfiles"
+  DB_DUMP="/tmp/current_db.dump"
+  if [ ! -f "${DB_DUMP}" ]; then
+      echo "ERROR: DB dump not found in snapshot at ${DB_DUMP}" >&2
+      exit 1
+  fi
 
-if [ ! -f "${DB_DUMP}" ]; then
-    echo "ERROR: DB dump not found in snapshot at ${DB_DUMP}"
-    exit 1
+  if ! pg_restore --list "${DB_DUMP}" > /dev/null; then
+      echo "ERROR: Database dump is invalid or unreadable: ${DB_DUMP}" >&2
+      exit 1
+  fi
+
+  echo "Pushing database dump to PostgreSQL container (${PGHOST})..."
+  pg_restore -h "${PGHOST}" -U "${PGUSERNAME}" -d "${PGDBNAME}" \
+    --clean --if-exists --no-owner --no-acl --verbose "${DB_DUMP}"
+
+  echo "Cleaning up temporary DB dump..."
+  rm -f "${DB_DUMP}"
+  echo "Database restore complete."
 fi
 
-if ! pg_restore --list "${DB_DUMP}" > /dev/null; then
-    echo "ERROR: Database dump is invalid or unreadable: ${DB_DUMP}" >&2
-    exit 1
+if [[ "$MODE" == "all" || "$MODE" == "media" ]]; then
+  echo "=== Restoring media files... ==="
+
+  echo "Clearing existing media files in the shared volume..."
+  find /uploadedfiles -mindepth 1 -delete
+
+  echo "Extracting files to /uploadedfiles..."
+  restic restore "${SNAPSHOT_ID}" --target / --include /uploadedfiles
+
+  echo "Media files restore complete."
 fi
-
-if [ ! -d "${RESTORE_SOURCE}" ]; then
-    echo "ERROR: Uploads directory not found in snapshot at ${RESTORE_SOURCE}"
-    exit 1
-fi
-
-echo "Snapshot successfully restored to temporary staging directory: ${TMP_DIR}"
-
-echo "Pushing database dump to PostgreSQL container (${PGHOST})..."
-
-pg_restore -h "${PGHOST}" -U "${PGUSERNAME}" -d "${PGDBNAME}" \
-  --clean --if-exists --no-owner --no-acl --verbose "${DB_DUMP}"
-
-echo "Database restore complete."
-
-echo "Restoring media files from staging directory to the application's upload directory..."
-
-echo "Clearing existing media files in the shared volume..."
-find /uploadedfiles -mindepth 1 -delete
-
-echo "Copying restored media files..."
-cp -a "${RESTORE_SOURCE}/." /uploadedfiles/
-
-echo "Media files restore complete."
-
-echo "Cleaning up temporary staging directory..."
-rm -rf "${TMP_DIR}"
 
 echo "=== System rollback completed successfully! ==="
