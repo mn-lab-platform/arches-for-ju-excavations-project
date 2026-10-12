@@ -84,11 +84,11 @@ To take advantage of the Backup Daemon you need to perform the following steps:
 
 And just like that Backup Daemon is ready to backup and restore data from your Arches for JU Excavations instance. To backup your data simply execute:
 ```bash
-    docker exec -it arches_backup_daemon ./backup.sh
+    docker exec -it -d arches_backup_daemon ./backup.sh
 ```
 Similarly to rollback to a specific point in time execute:
 ```bash
-    docker exec -it arches_backup_daemon ./restore.sh <SNAPSHOT_ID>
+    docker exec -it -d arches_backup_daemon ./restore.sh <SNAPSHOT_ID>
 ```
 
 To access the SNAPSHOT_ID necessary for the restore command to run, execute:
