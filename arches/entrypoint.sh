@@ -276,8 +276,8 @@ run_django_server() {
 		# The GUNICORN_CONFIG_PATH breaks this, (errors in urls.py) so we'll just run it directly
 		# echo "gunicorn ${ARCHES_PROJECT}.wsgi:application --config ${GUNICORN_CONFIG_PATH}"
 		# exec sh -c "gunicorn ${ARCHES_PROJECT}.wsgi:application --config ${GUNICORN_CONFIG_PATH}"
-		echo "gunicorn -w 12 -b 0.0.0.0:${DJANGO_PORT} ${ARCHES_PROJECT}.wsgi:application --timeout 3600"
-		exec sh -c "gunicorn -w 12 -b 0.0.0.0:${DJANGO_PORT} ${ARCHES_PROJECT}.wsgi:application --timeout 3600"
+		echo "gunicorn -w 12 -b 0.0.0.0:${DJANGO_PORT} ${ARCHES_PROJECT}.wsgi:application --reload --timeout 3600"
+		exec sh -c "gunicorn -w 12 -b 0.0.0.0:${DJANGO_PORT} ${ARCHES_PROJECT}.wsgi:application --reload --timeout 3600"
 		# echo "gunicorn -b 0.0.0.0:${DJANGO_PORT} ${ARCHES_PROJECT}.wsgi:application"
 		# exec sh -c "gunicorn -b 0.0.0.0:${DJANGO_PORT} ${ARCHES_PROJECT}.wsgi:application"
 	fi
@@ -328,13 +328,20 @@ run_setup_shared_volumes() {
 	chmod -R g+s ${UPLOAD_DIR}
 
 	echo "Shared volume permissions configured for ${UPLOAD_DIR}"
+}
 
+configure_verify_reader() {
+	echo ""
+	echo "----- CONFIGURING VERIFY READER -----"
+	echo ""
+	"${APP_FOLDER}/configure_verify_reader.sh"
 	echo "---------------------------------------------------------------"
 }
 
 #### Main commands
 run_arches() {
 	init_arches
+	configure_verify_reader
 	run_elastic_safe_migrations
 	run_createcachetable
 	start_celery_supervisor

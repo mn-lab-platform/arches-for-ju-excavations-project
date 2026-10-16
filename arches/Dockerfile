@@ -244,6 +244,10 @@ COPY /arches/entrypoint.sh ${APP_ROOT}/entrypoint.sh
 RUN chmod -R 700 ${APP_ROOT}/entrypoint.sh &&\
   dos2unix ${APP_ROOT}/entrypoint.sh
 
+COPY /arches/configure_verify_reader.sh ${APP_ROOT}/configure_verify_reader.sh
+RUN chmod -R 700 ${APP_ROOT}/configure_verify_reader.sh &&\
+  dos2unix ${APP_ROOT}/configure_verify_reader.sh
+
 
 # Set default workdir
 WORKDIR ${APP_ROOT}

@@ -74,3 +74,6 @@ EMAIL_PASSWORD='YOUR EMAIL PASSWORD'
 ADMIN_PASSWORD=admin
 APP_TITLE="Arches for JU Excavations"
 EXCAVATION_NAME="Arches for JU Excavations"
+
+# ARCHES VERIFY SERVICE
+VERIFY_DB_PASSWORD=random_password_for_verification
