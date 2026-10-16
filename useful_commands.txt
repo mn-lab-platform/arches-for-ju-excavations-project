@@ -48,3 +48,50 @@ from django.db import connection
 with connection.cursor() as cursor:
     cursor.execute("SELECT refresh_geojson_geometries();")
     print(cursor.fetchone())
+
+NIE MA MAPY MOŻE KTOŚ XJEBAŁ ODDAWNIE LAYERSA->
+sudo docker compose exec -T arches python manage.py shell -c "
+from arches.app.models.models import MapSource
+
+for source in MapSource.objects.all().order_by('pk'):
+    config = source.source or {}
+    bounds = config.get('bounds')
+
+    invalid = bounds is not None and (
+        not isinstance(bounds, list)
+        or len(bounds) != 4
+        or not all(isinstance(value, (int, float)) for value in bounds)
+    )
+
+    if invalid:
+        print(
+            'PK=', source.pk,
+            'NAME=', source.name,
+            'BOUNDS=', bounds
+        )
+"
+INTO 
+sudo docker compose exec -T arches python manage.py shell -c "
+from django.db import transaction
+from arches.app.models.models import MapSource
+
+source_name = '<MAP_SOURCE_NAME_OR_UUID>'
+
+with transaction.atomic():
+    source = MapSource.objects.select_for_update().get(name=source_name)
+    config = dict(source.source or {})
+    bounds = config.get('bounds')
+
+    print('BEFORE:', config)
+
+    assert bounds is not None
+    assert not isinstance(bounds, list), bounds
+
+    config.pop('bounds')
+    source.source = config
+    source.save(update_fields=['source'])
+
+    print('AFTER:', source.source)
+"
+
+docker compose run --rm backup_daemon restic init   
