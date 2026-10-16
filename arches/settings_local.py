@@ -169,15 +169,15 @@ EXTRA_EMAIL_CONTEXT = {
 
 LANDING_IMAGE_SLIDES_CONFIG = [
     {
-        "caption": "Arches for JU Excavations - To edit this caption, image and attribution, please check the manual.",
-        "image_attribution": "Collegium Novum. Photo by Swifteye"
+        "caption": "Digital research platform for the Maloutena and Agora excavations at Nea Paphos, Cyprus, conducted by Jagiellonian University and the University of Warsaw.",
+        "image_attribution": "Aerial view of the Kato Pafos Archaeological Park. Photo by W. Ostrowski (MAP Project Archive)"
     },
     {
-        "caption": "Arches for JU Excavations - To edit this caption, image and attribution, please check the manual.",
-        "image_attribution": "Assembly Hall, Collegium Novum. Photo by Anna Wojnar"
+        "caption": "Digital research platform for the Maloutena and Agora excavations at Nea Paphos, Cyprus, conducted by Jagiellonian University and the University of Warsaw.",
+        "image_attribution": "East portico of the Agora, Paphos. Photo by W. Ostrowski (MAP Project Archive)"
     },
     {
-        "caption": "Arches for JU Excavations - To edit this caption, image and attribution, please check the manual.",
-        "image_attribution": "Main Square, Kraków. Photo by Swifteye"
+        "caption": "Digital research platform for the Maloutena and Agora excavations at Nea Paphos, Cyprus, conducted by Jagiellonian University and the University of Warsaw.",
+        "image_attribution": "Aerial view of Maloutena. Photo by W. Ostrowski (MAP Project Archive)"
     }
 ]
