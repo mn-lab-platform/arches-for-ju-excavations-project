@@ -8,7 +8,9 @@ const BundleTracker = require('webpack-bundle-tracker');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const { VueLoaderPlugin } = require("vue-loader");
+
+const { requireVueLoaderWithTypeResolutionPatch } = require('./webpack-utils/patch-vue-compiler-sfc-type-resolution');
+const { VueLoaderPlugin } = requireVueLoaderWithTypeResolutionPatch();
 
 const { buildFilepathLookup } = require('./webpack-utils/build-filepath-lookup');
 
@@ -24,12 +26,24 @@ module.exports = () => {
         global.APP_ROOT = parsedData['APP_ROOT'];
         global.ARCHES_APPLICATIONS = parsedData['ARCHES_APPLICATIONS'];
         global.ARCHES_APPLICATIONS_PATHS = parsedData['ARCHES_APPLICATIONS_PATHS'];
+        global.RESOLVABLE_APPLICATION_PATHS = parsedData['RESOLVABLE_APPLICATION_PATHS'] || {};
         global.SITE_PACKAGES_DIRECTORY = parsedData['SITE_PACKAGES_DIRECTORY'];
         global.ROOT_DIR = parsedData['ROOT_DIR'];
         global.STATIC_URL = parsedData['STATIC_URL'];
         global.WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT'];
 
         // END get data from `webpack-metadata.json`
+        // BEGIN identify bundled applications that are resolvable but not installed
+
+        // Bundled applications always ship their source with arches, so their internal
+        // imports (JS, templates, `@/<app>` Vue paths) must resolve even when a project
+        // has not enabled them. They must NOT contribute entry points, templates, or
+        // static files of their own -- those still come from installed applications only.
+        const resolvableOnlyApplicationLabels = Object.keys(RESOLVABLE_APPLICATION_PATHS).filter(
+            (label) => !ARCHES_APPLICATIONS.includes(label)
+        );
+
+        // END identify bundled applications that are resolvable but not installed
         // BEGIN workaround for handling node_modules paths in arches-core vs projects
 
         let PROJECT_RELATIVE_NODE_MODULES_PATH;
@@ -42,9 +56,6 @@ module.exports = () => {
 
         // END workaround for handling node_modules paths in arches-core vs projects
         // BEGIN create entry point configurations
-
-        const cesiumSource = Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'cesium', 'Build', 'Cesium');
-        const cesiumOutputPath = 'cesium';
 
         const archesCoreEntryPointConfiguration = buildFilepathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'js'));
         const projectEntryPointConfiguration = buildFilepathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'js'));
@@ -64,6 +75,9 @@ module.exports = () => {
         };
 
         // END create entry point configurations
+
+        const cesiumSource = Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'cesium', 'Build', 'Cesium');
+        const cesiumOutputPath = 'cesium';
         // BEGIN create JavaScript filepath lookups
 
         const archesCoreJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.entries(archesCoreEntryPointConfiguration).reduce((acc, [path, config]) => {
@@ -79,9 +93,22 @@ module.exports = () => {
             return acc;
         }, {});
 
+        // resolvable-but-not-installed bundled applications: alias-only, not merged into `entryPoints`
+        const resolvableOnlyApplicationsJavascriptEntrypointConfiguration = resolvableOnlyApplicationLabels.reduce((acc, label) => {
+            return {
+                ...acc,
+                ...buildFilepathLookup(Path.resolve(__dirname, RESOLVABLE_APPLICATION_PATHS[label], 'media', 'js'))
+            };
+        }, {});
+        const resolvableOnlyApplicationsJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.entries(resolvableOnlyApplicationsJavascriptEntrypointConfiguration).reduce((acc, [path, config]) => {
+            acc[path + '$'] = Path.resolve(__dirname, path, config['import']);
+            return acc;
+        }, {});
+
         // order is important! Arches core files are overwritten by arches-application files, arches-application files are overwritten by project files
         const javascriptRelativeFilepathToAbsoluteFilepathLookup = {
             ...archesCoreJavascriptRelativeFilepathToAbsoluteFilepathLookup,
+            ...resolvableOnlyApplicationsJavascriptRelativeFilepathToAbsoluteFilepathLookup,
             ...archesApplicationsJavascriptRelativeFilepathToAbsoluteFilepathLookup,
             ...projectJavascriptRelativeFilepathToAbsoluteFilepathLookup,
         };
@@ -96,7 +123,8 @@ module.exports = () => {
         const archesCorePackageJSON = require(archesCorePackageJSONFilepath);
 
         const parsedArchesCoreNodeModulesAliases = Object.entries(archesCorePackageJSON['nodeModulesPaths']).reduce((acc, [alias, subPath]) => {
-            if (subPath.slice(0, 7) === 'plugins') {  // handles for node_modules -esque plugins in arches core
+            // handles for node_modules -esque sources shipped inside arches core's media directory
+            if (subPath.startsWith('plugins/') || subPath.startsWith('js/')) {
                 acc[alias] = Path.resolve(__dirname, ROOT_DIR, 'app', 'media', subPath);
             }
             else {
@@ -180,9 +208,18 @@ module.exports = () => {
             };
         }, {});
 
+        // resolvable-but-not-installed bundled applications: alias-only, not merged into entry points
+        const resolvableOnlyApplicationsTemplatePathConfiguration = resolvableOnlyApplicationLabels.reduce((acc, label) => {
+            return {
+                ...acc,
+                ...buildFilepathLookup(Path.resolve(__dirname, RESOLVABLE_APPLICATION_PATHS[label], 'templates'))
+            };
+        }, {});
+
         // order is important! Arches core files are overwritten by arches-application files, arches-application files are overwritten by project files
         const templateFilepathLookup = {
             ...coreArchesTemplatePathConfiguration,
+            ...resolvableOnlyApplicationsTemplatePathConfiguration,
             ...archesApplicationsTemplatePathConfiguration,
             ...projectTemplatePathConfiguration,
         };
@@ -240,6 +277,12 @@ module.exports = () => {
             return acc;
         }, []);
 
+        // resolvable-but-not-installed bundled applications: alias-only, so their internal
+        // `@/<app>/...` imports resolve even though they contribute no CSS/entry points
+        const resolvableOnlyApplicationVuePaths = resolvableOnlyApplicationLabels.map(
+            (label) => Path.resolve(__dirname, RESOLVABLE_APPLICATION_PATHS[label], 'src')
+        );
+
         // END create vue filepath lookup
         // BEGIN create universal constants
 
@@ -259,6 +302,8 @@ module.exports = () => {
                 linkedApplicationPathCount += 1;
             }
         }
+
+        // END create universal constants
 
         resolve({
             entry: {
@@ -284,14 +329,14 @@ module.exports = () => {
                     cacheGroups: {
                         vendors: {
                             test: /[\\/]node_modules[\\/]/,
-                            enforce: true, 
+                            enforce: true,
                             priority: -10,
                             reuseExistingChunk: true,
                             filename: 'chunks/vendors.[contenthash].js'
                         },
                         commons: {
                             minChunks: 2,
-                            enforce: true, 
+                            enforce: true,
                             priority: -20,
                             reuseExistingChunk: true,
                             filename: 'chunks/commons.[contenthash].js'
@@ -307,13 +352,12 @@ module.exports = () => {
                 new webpack.DefinePlugin({
                     ARCHES_URLS: webpack.DefinePlugin.runtimeValue(
                         () => fs.readFileSync(
-                            Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, '..', 'frontend_configuration', 'urls.json'), 
+                            Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, '..', 'frontend_configuration', 'urls.json'),
                             'utf-8'
                         ),
                         true  // should be re-evaluated on rebuild
                     ),
                 }),
-
                 new webpack.DefinePlugin({
                     __VUE_OPTIONS_API__: 'true',
                     __VUE_PROD_DEVTOOLS__: 'false',
@@ -348,37 +392,41 @@ module.exports = () => {
                     ],
                 }),
                 new webpack.DefinePlugin({
-                    CESIUM_BASE_URL: JSON.stringify(STATIC_URL + cesiumOutputPath + '/') 
-                }),
-                new webpack.DefinePlugin({ 
-                    'process.env.CESIUM_ION_TOKEN': JSON.stringify(process.env.CESIUM_ION_TOKEN)
+                    CESIUM_BASE_URL: JSON.stringify(STATIC_URL + cesiumOutputPath + '/'),
+                    'process.env.CESIUM_ION_TOKEN': JSON.stringify(process.env.CESIUM_ION_TOKEN),
                 }),
             ],
             resolve: {
-                modules: [Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH)],
+                extensions: ['.ts', '.tsx', '.wasm', '.mjs', '.js', '.json'],
+                // 'node_modules' re-enables webpack's normal upward search so
+                // packages' own nested node_modules (e.g. nanoid pinned per-dependent
+                // due to a version conflict) are still resolvable.
+                modules: [Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH), 'node_modules'],
                 alias: {
                     ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
                     ...templateFilepathLookup,
                     ...imageFilepathLookup,
                     ...nodeModulesAliases,
-                    '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')],
+                    // Legacy AMD modules in the excavation app require the package root.
+                    // MapLibre 6 exposes only an ESM import condition for that root.
+                    'maplibre-gl$': Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'maplibre-gl', 'dist', 'maplibre-gl.mjs'),
+                    '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, ...resolvableOnlyApplicationVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')],
                     'node_modules': Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH),
-                    
-                    // Add Cesium-specific jQuery resolution
-                    '/arches_app/arches_for_excavation/node_modules/jquery/dist/jquery.min': Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'jquery', 'dist', 'jquery.min.js'),
-                    
                     'arches/arches/app': Path.resolve(__dirname, ROOT_DIR, 'app'),  // ensure project-level imports of arches components point to local file
-
                     ...Object.fromEntries(ARCHES_APPLICATIONS.map(app => [  // ensure project-level imports of arches application components point to local file
                         Path.join(app, app), Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[app])
                     ])),
-                }
+                },
             },
             module: {
                 rules: [
                     {
+                        test: /\.(d\.ts|(spec|test)\.tsx?)$/,
+                        type: "asset/source",
+                    },
+                    {
                         test: /\.tsx?$/,
-                        exclude: /node_modules/,
+                        exclude: [/node_modules/, /\.d\.ts$/, /\.(spec|test)\.tsx?$/],
                         loader: Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'ts-loader'),
                         options: {
                             appendTsSuffixTo: [/\.vue$/],
@@ -392,8 +440,28 @@ module.exports = () => {
                         loader: Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'vue-loader'),
                     },
                     {
+                        // Emit maplibre-gl's worker script as a static asset for `new URL(...)`.
+                        test: /maplibre-gl-worker(-dev)?\.mjs$/,
+                        type: 'asset/resource',
+                        generator: {
+                            filename: 'js/[name][ext]',
+                        },
+                    },
+                    {
+                        // The worker imports this at runtime; emit it as an asset too
+                        // (via `?asset`), while normal imports still bundle as JS below.
+                        test: /maplibre-gl-shared(-dev)?\.mjs$/,
+                        resourceQuery: /asset/,
+                        type: 'asset/resource',
+                        generator: {
+                            filename: 'js/[name][ext]',
+                        },
+                    },
+                    {
                         test: /\.mjs$/,
                         include: /node_modules/,
+                        exclude: /maplibre-gl-worker(-dev)?\.mjs$/,
+                        resourceQuery: { not: /asset/ },
                         type: 'javascript/auto',
                     },
                     {
@@ -428,6 +496,7 @@ module.exports = () => {
                             Path.resolve(__dirname, APP_ROOT, 'src'),
                             Path.resolve(__dirname, ROOT_DIR, 'app', 'src'),
                             ...archesApplicationsVuePaths,
+                            ...resolvableOnlyApplicationVuePaths,
                         ],
                         use: [
                             {

@@ -2,13 +2,14 @@ services:
 
   arches_db:
     container_name: arches_db
-    image: postgis/postgis:14-3.2
+    image: postgis/postgis:15-3.5
     env_file:
       - ./.env
     environment:
       - PGUSER=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgis
+      - POSTGRES_DB=${PGDBNAME}
       - POSTGRES_MULTIPLE_EXTENSIONS=postgis,postgis_topology
     restart: unless-stopped
     volumes:
@@ -75,6 +76,8 @@ services:
     build:
       context: .
       dockerfile: arches/Dockerfile
+      additional_contexts:
+        excavation_app: ../arches-for-excavation-application
       args:
         ARCHES_PROJECT: ${ARCHES_PROJECT}
         ARCHES_ROOT: ${ARCHES_ROOT}
@@ -89,7 +92,7 @@ services:
     tty: true
     ports:
       - 5432:5432
-      - 8000:8000
+      - 8001:8000
       - 5678:5678
       - 5984:5984
     depends_on:
@@ -103,7 +106,8 @@ services:
       - arches-static:/static_root
       - uploads:/arches_app/${ARCHES_PROJECT}/${ARCHES_PROJECT}/uploadedfiles
       - ../arches_data/:/arches_data
-      # - ../arches-for-excavation-application/arches_for_excavation:/opt/venv/lib/python3.13/site-packages/arches_for_excavation
+      - ../arches-for-excavation-application/arches_for_excavation:/opt/venv/lib/python3.13/site-packages/arches_for_excavation
+      - ./arches/settings_local.py:/arches_app/${ARCHES_PROJECT}/${ARCHES_PROJECT}/settings_local.py:ro
     networks:
       - arches_for_excavation_net
 
@@ -138,26 +142,26 @@ services:
     environment:
       - TITILER_ALLOW_LOCAL=true
   
-  arches_backup_daemon:
-    container_name: arches_backup_daemon
-    hostname: arches_backup_daemon
-    profiles: ["backup"]
-    build:
-      context: ./backup_daemon
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    env_file:
-      - ./.env
-    environment:
-      - RESTIC_PASSWORD=${RESTIC_PASSWORD}
-      - RESTIC_REPOSITORY=/backups
-    volumes:
-      - uploads:/uploadedfiles
-      - ${BACKUPS_DIRECTORY}:/backups
-    depends_on:
-      - arches_db
-    networks:
-      - arches_for_excavation_net
+  # arches_backup_daemon:
+  #   container_name: arches_backup_daemon
+  #   hostname: arches_backup_daemon
+  #   profiles: ["backup"]
+  #   build:
+  #     context: ./backup_daemon
+  #     dockerfile: Dockerfile
+  #   restart: unless-stopped
+  #   env_file:
+  #     - ./.env
+  #   environment:
+  #     - RESTIC_PASSWORD=${RESTIC_PASSWORD}
+  #     - RESTIC_REPOSITORY=/backups
+  #   volumes:
+  #     - uploads:/uploadedfiles
+  #     - ${BACKUPS_DIRECTORY}:/backups
+  #   depends_on:
+  #     - arches_db
+  #   networks:
+  #     - arches_for_excavation_net
 
 networks:
   arches_for_excavation_net:

@@ -3,7 +3,7 @@ requires = ["setuptools>=77", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "arches_for_excavation"
+name = "arches-for-excavation-project"
 readme = "README.md"
 authors = []
 license = "AGPL-3.0-or-later"
@@ -12,18 +12,19 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Framework :: Django",
-    "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Information Technology",
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
-    "arches>=8.0.0,<8.1.0",
+    "arches>=8.2.0a12,<8.3.0",
+    "arches-search==0.1.0a20",
+    "arches-modular-reports @ git+https://github.com/archesproject/arches-modular-reports.git@dev/2.1.x",
 ]
 version = "0.0.1"
 

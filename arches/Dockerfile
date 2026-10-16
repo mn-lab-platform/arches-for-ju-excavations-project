@@ -113,7 +113,6 @@ RUN set -ex \
         wait-for-it \
         nano \
     " \
-    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && curl -sL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql-keyring.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/postgresql-keyring.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" | tee /etc/apt/sources.list.d/postgresql.list \
     && apt-get update -y \
@@ -129,7 +128,7 @@ RUN set -ex \
 # ----------------------------------------------
 
 # Set environment variables
-ENV NODE_MAJOR=18
+ENV NODE_MAJOR=22
 
 # Update package lists and install necessary packages
 RUN apt-get update \
@@ -169,18 +168,26 @@ RUN pip install supervisor \
     && pip install tzdata --upgrade \
     && pip install Redis \
     && pip install gunicorn \
-    && pip install arches==8.0.3 \
+    && pip install --pre arches==8.2.0a12 arches-search==0.1.0a20 \
+        "arches-modular-reports @ git+https://github.com/archesproject/arches-modular-reports.git@dev/2.1.x" \
     && pip install rasterio \
     && pip install pyproj==3.7.2 \
     && pip install pyvips \
     && pip install numpy==2.4.2 \
-    && pip install "djangorestframework>=3.14.0" \
-    && pip install --no-cache-dir git+https://github.com/mn-lab-platform/arches-for-ju-excavations.git
+    && pip install "djangorestframework>=3.14.0"
+
+# Install the local excavation application that is built against Arches 8.2.
+COPY --from=excavation_app / /tmp/excavation_app
+RUN pip install --no-cache-dir /tmp/excavation_app \
+    && pip check \
+    && rm -rf /tmp/excavation_app
+COPY --from=excavation_app /arches_for_excavation/ /opt/venv/lib/python3.13/site-packages/arches_for_excavation/
 
 # create a new Arches project
 RUN mkdir -p /new_arches_proj
 RUN arches-admin startproject ${ARCHES_PROJECT} --directory /new_arches_proj
 RUN mv /new_arches_proj ${APP_ROOT}
+COPY ./${ARCHES_PROJECT}/pyproject.toml ${APP_ROOT}/pyproject.toml
 
 # create the uploaded files folder
 RUN mkdir -p ${UPLOADED_FILES_FOLDER}
@@ -210,6 +217,9 @@ RUN sed -i 's/\r$//g' ${GUNICORN_CONFIG_PATH}
 COPY ./${ARCHES_PROJECT}/media/ ${APP_COMP_FOLDER}/media/
 COPY ./${ARCHES_PROJECT}/package.json ${APP_ROOT}/package.json
 COPY ./${ARCHES_PROJECT}/webpack/webpack.common.js ${APP_ROOT}/webpack/webpack.common.js
+COPY ./arches/refresh_webpack_metadata.py ${APP_ROOT}/refresh_webpack_metadata.py
+RUN python ${APP_ROOT}/refresh_webpack_metadata.py \
+    ${APP_ROOT}/frontend_configuration/webpack-metadata.json ${APP_COMP_FOLDER}
 COPY ./${ARCHES_PROJECT}/setup_admin_password.py ${APP_ROOT}/setup_admin_password.py
 COPY ./arches_for_excavation_project/register_extensions.sh ${APP_ROOT}/register_extensions.sh
 RUN chmod -R 700 ${APP_ROOT}/register_extensions.sh &&\

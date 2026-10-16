@@ -16,8 +16,8 @@ UPLOADED_FILES_FOLDER=$APP_COMP_FOLDER/uploadedfiles
 # NOTE: the ARCHES_NAMESPACE needs to look like a URL, ending in a '/',
 ARCHES_NAMESPACE=http://$ARCHES_PROJECT:8000/
 
-# This will hopefully make the yarn build not fail.
-NODE_OPTIONS='--max-old-space-size=1024'
+# Allow Webpack enough memory to build Arches 8.2 and its applications.
+NODE_OPTIONS='--max-old-space-size=4096'
 INSTALL_DEFAULT_GRAPHS=True
 INSTALL_DEFAULT_CONCEPTS=True
 # Don't change these, because I can't figure out how dynamically pass

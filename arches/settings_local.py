@@ -26,6 +26,7 @@ from .settings import (
     TEMPLATES,
     UPLOADED_FILES_DIR,
 )
+from . import settings as base_settings
 
 RASTER_DATA_DIR = os.path.join(
     APP_ROOT,
@@ -48,6 +49,12 @@ IIIF_RAW_DEM_DIR = os.path.join(
 )
 MODE = get_env_variable("DJANGO_MODE")
 DEBUG = ast.literal_eval(get_env_variable("DJANGO_DEBUG"))
+# The frontend is rebuilt inside the running container. Keep webpack-loader
+# from serving a stale webpack-stats.json after a new build and collectstatic.
+WEBPACK_LOADER = {
+    name: {**config, "CACHE": False}
+    for name, config in base_settings.WEBPACK_LOADER.items()
+}
 DEPLOY_HOST = get_env_variable("DEPLOY_HOST")
 DOMAIN_NAMES = get_env_variable("DOMAIN_NAMES").split()
 is_localhost = any(host in ['localhost', '127.0.0.1', '0.0.0.0'] for host in DOMAIN_NAMES)
@@ -73,8 +80,26 @@ WRAPPER_MEDIA_DIR = os.path.join(os.path.dirname(__file__), 'media')
 TEMPLATES[0]['DIRS'] = [os.path.join(APP_DIR, 'templates')] + list(TEMPLATES[0]['DIRS'])
 STATICFILES_DIRS = [WRAPPER_MEDIA_DIR, os.path.join(APP_DIR, 'media')] + list(STATICFILES_DIRS)
 
-if 'arches_for_excavation' not in INSTALLED_APPS:
-    INSTALLED_APPS += ('arches_for_excavation',)
+# Extension templates must take precedence over Arches core templates.
+# Reposition bundled apps as well because Arches 8.2 project templates may
+# already contain them.
+_extension_apps = (
+    'arches_for_excavation',
+    'rest_framework',
+    'arches_resource_sets',
+    'arches_search',
+    'arches_modular_reports',
+    'arches.extensions.querysets',
+    'arches.extensions.vue_components',
+    'arches.extensions.controlled_lists',
+)
+INSTALLED_APPS = tuple(app for app in INSTALLED_APPS if app not in _extension_apps)
+_core_app_index = INSTALLED_APPS.index('arches.app')
+INSTALLED_APPS = (
+    INSTALLED_APPS[:_core_app_index]
+    + _extension_apps
+    + INSTALLED_APPS[_core_app_index:]
+)
 
 CUSTOM_PROCESSOR = 'arches_for_excavation.context_processors.custom_context'
 if CUSTOM_PROCESSOR not in TEMPLATES[0]['OPTIONS']['context_processors']:
@@ -95,6 +120,7 @@ DATABASES = {
 ARCHES_NAMESPACE_FOR_DATA_EXPORT = get_optional_env_variable("ARCHES_EXPORT_NAMESPACE") or get_env_variable("ARCHES_NAMESPACE")
 
 CACHES = {
+    **base_settings.CACHES,
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "LOCATION": "redis://arches_redis:6379/1",
@@ -128,6 +154,24 @@ if USER_SECRET_KEY:
 
 STATIC_ROOT = "/static_root"
 
+# arches-search expects this setting during its bulk reindex command.
+INDEX_BATCH_SIZE = 2000
+
+# The Vue map reads its styles from BASEMAPS, independently of map_layers in
+# the database. Keep a public basemap available even when uploaded rasters are
+# absent from a database-only restore.
+BASEMAPS = [
+    {
+        "name": "carto-voyager",
+        "title": "Streets",
+        "url": "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
+        "addtomap": True,
+    }
+]
+PUBLIC_SERVER_ADDRESS = (
+    get_optional_env_variable("PUBLIC_SERVER_ADDRESS") or f"https://{DEPLOY_HOST}/"
+).rstrip("/") + "/"
+
 LANGUAGE_CODE = 'en'
 LANGUAGES = [
     ('en', ('English')),
@@ -139,33 +183,41 @@ SHOW_LANGUAGE_SWITCH = False
 APP_TITLE = get_optional_env_variable("APP_TITLE") or "Arches for JU Excavation"
 _DOMAIN_URL = f"https://{DEPLOY_HOST}"
 
-DEFAULT_FROM_EMAIL = get_optional_env_variable("DEFAULT_FROM_EMAIL") or "xxxx@xxx.com"
-EMAIL_USE_TLS = get_optional_env_variable("EMAIL_USE_TLS") or "false"
-EMAIL_USE_TLS = EMAIL_USE_TLS.lower() in ['true', '1', 't']
-EMAIL_USE_SSL = get_optional_env_variable("EMAIL_USE_SSL") or "false"
-EMAIL_USE_SSL = EMAIL_USE_SSL.lower() in ['true', '1', 't']
-EMAIL_HOST = get_optional_env_variable("EMAIL_HOST") or 'smtp.gmail.com'
-EMAIL_HOST_USER = get_optional_env_variable("EMAIL_HOST_USER") or "xxxx@xxx.com"
-EMAIL_HOST_PASSWORD = get_optional_env_variable("EMAIL_PASSWORD") or "xxxx"
-EMAIL_PORT = int(get_optional_env_variable("EMAIL_PORT") or "587")
+# DEFAULT_FROM_EMAIL = get_optional_env_variable("DEFAULT_FROM_EMAIL") or "xxxx@xxx.com"
+# MAILERS = {
+#     **getattr(base_settings, "MAILERS", {}),
+#     "default": {
+#         "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+#         "OPTIONS": {
+#             "host": get_optional_env_variable("EMAIL_HOST") or "smtp.gmail.com",
+#             "port": int(get_optional_env_variable("EMAIL_PORT") or "587"),
+#             "username": get_optional_env_variable("EMAIL_HOST_USER") or "xxxx@xxx.com",
+#             "password": get_optional_env_variable("EMAIL_PASSWORD") or "xxxx",
+#             "use_tls": (get_optional_env_variable("EMAIL_USE_TLS") or "false").lower()
+#             in ("true", "1", "t"),
+#             "use_ssl": (get_optional_env_variable("EMAIL_USE_SSL") or "false").lower()
+#             in ("true", "1", "t"),
+#         },
+#     },
+# }
 
-EXTRA_EMAIL_CONTEXT = {
-    "salutation": "Hi", 
-    "expiration": '24 hours', 
-    "arches_project_name": APP_TITLE,
-    "greeting": mark_safe("""
-        Thanks for signing up to the <strong><a href="https://www.archesproject.org/" style="color:#0070d2; text-decoration:underline;">Arches</a></strong> instance created as part of the 
-        <strong><a href="https://mare.id.uj.edu.pl/pl" style="color:#0070d2; text-decoration:underline;">Mare Nostrum Lab</a></strong>, a project of the 
-        <strong>Institute of Archaeology at Jagiellonian University</strong>. 
-        All you need to do is confirm your email address by clicking the button below and we are good to go. 🏛️
-    """),
-    "button_text": "Confirm",
-    "domain_url": _DOMAIN_URL,
-    "footer_strong_text": mark_safe("Institute of Archaeology &bull; Jagiellonian University"),
-    "footer_additional_text": mark_safe("Gołębia 11 &middot; 31-007 Kraków &middot; Poland"),
-    "email_header_image_url": 'img/email/default/email_header.png',
-    "email_footer_image_url": 'img/email/default/email_footer.png'
-}
+# EXTRA_EMAIL_CONTEXT = {
+#     "salutation": "Hi",
+#     "expiration": '24 hours',
+#     "arches_project_name": APP_TITLE,
+#     "greeting": mark_safe("""
+#         Thanks for signing up to the <strong><a href="https://www.archesproject.org/" style="color:#0070d2; text-decoration:underline;">Arches</a></strong> instance created as part of the
+#         <strong><a href="https://mare.id.uj.edu.pl/pl" style="color:#0070d2; text-decoration:underline;">Mare Nostrum Lab</a></strong>, a project of the
+#         <strong>Institute of Archaeology at Jagiellonian University</strong>.
+#         All you need to do is confirm your email address by clicking the button below and we are good to go. 🏛️
+#     """),
+#     "button_text": "Confirm",
+#     "domain_url": _DOMAIN_URL,
+#     "footer_strong_text": mark_safe("Institute of Archaeology &bull; Jagiellonian University"),
+#     "footer_additional_text": mark_safe("Gołębia 11 &middot; 31-007 Kraków &middot; Poland"),
+#     "email_header_image_url": 'img/email/default/email_header.png',
+#     "email_footer_image_url": 'img/email/default/email_footer.png'
+# }
 
 LANDING_IMAGE_SLIDES_CONFIG = [
     {

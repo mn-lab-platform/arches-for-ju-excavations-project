@@ -6,7 +6,7 @@ APP_COMP_FOLDER=${APP_COMP_FOLDER}
 GUNICORN_CONFIG_PATH=${APP_COMP_FOLDER}/gunicorn_config.py
 STATIC_ROOT=/static_root
 STATIC_JS=${STATIC_ROOT}/js
-WEBPACK_STATS_PATH=${APP_FOLDER}/webpack-stats.json 
+WEBPACK_STATS_PATH=${APP_FOLDER}/webpack/webpack-stats.json
 
 # Environmental Variables
 export DJANGO_PORT=${DJANGO_PORT:-8000}
@@ -52,6 +52,12 @@ db_exists() {
 	fi
 }
 
+db_initialized() {
+	local initialized
+	initialized=$(psql --host="${PGHOST}" --port="${PGPORT}" --user="${PGUSERNAME}" --dbname="${PGDBNAME}" -Atc "SELECT to_regclass('public.django_migrations') IS NOT NULL" 2>/dev/null) || return 1
+	[[ "${initialized}" == "t" ]]
+}
+
 #### Install
 init_arches() {
 	echo "Checking if Arches project "${ARCHES_PROJECT}" exists..."
@@ -77,13 +83,13 @@ init_arches() {
 	else
 		echo "Custom Arches project '${ARCHES_PROJECT}' exists."
 		wait_for_db
-		if db_exists; then
-			echo "Database ${PGDBNAME} already exists."
+		if db_exists && db_initialized; then
+			echo "Database ${PGDBNAME} is initialized."
 			echo "Skipping Package Loading"
 		else
-			echo "Database ${PGDBNAME} does not exists yet."
-			run_setup_db
-			run_elastic_safe_migrations
+			echo "Database ${PGDBNAME} needs initialization."
+			run_setup_db || return $?
+			run_elastic_safe_migrations || return $?
 			setup_couchdb
 		fi
 	fi
@@ -201,29 +207,19 @@ run_collect_static_nocheck() {
 }
 
 run_setup_arches_setup_webpack() {
-    if [[ ! -f ${WEBPACK_STATS_PATH} ]] || [[ ! -d ${STATIC_JS} ]] || [[ ! "$(ls ${STATIC_JS})" ]]; then
+    if [[ ! -f ${WEBPACK_STATS_PATH} ]] || ! grep -q '"status": "done"' "${WEBPACK_STATS_PATH}" || [[ ! -d ${STATIC_JS} ]] || [[ ! "$(ls ${STATIC_JS})" ]]; then
         cd ${APP_FOLDER}
-        echo "Starting Django development server" 
-        python manage.py runserver 0.0.0.0:8000 &
-        
+
         if [[ ${BUILD_PRODUCTION} == 'True' ]]; then
             echo "Running npm PRODUCTION build and collectstatic" 
-            npm run build_production && python manage.py collectstatic --noinput
+            npm run build_production || return $?
         else
             echo "Running npm DEVELOPMENT build and collectstatic" 
-            npm run build_development && python manage.py collectstatic --noinput
+            npm run build_development || return $?
         fi
+        python manage.py collectstatic --noinput || return $?
     else
         echo "Webpack and Collectstatic for setup already completed.";
-    fi
-
-    RUNSERVER_PID=$(pgrep -f "manage.py runserver") 
-    if [ -n "$RUNSERVER_PID" ]; then 
-        echo "Killing manage.py runserver process with PID $RUNSERVER_PID" 
-        kill -9 $RUNSERVER_PID
-        echo "Process $RUNSERVER_PID killed" 
-    else 
-        echo "No manage.py runserver process found"
     fi
 }
 
@@ -315,11 +311,11 @@ run_create_custom_auth_groups() {
 
 #### Main commands
 run_arches() {
-	init_arches
-	run_elastic_safe_migrations
+	init_arches || return $?
+	run_elastic_safe_migrations || return $?
 	run_createcachetable
 	start_celery_supervisor
-	run_setup_arches_setup_webpack
+	run_setup_arches_setup_webpack || return $?
 	run_setup_admin_password
 	run_create_custom_auth_groups
 	run_setup_mn_thesaurus_provider
@@ -344,7 +340,7 @@ run_livereload() {
 # If no arguments are supplied, assume the server needs to be run
 if [[ $#  -eq 0 ]]; then
 	wait_for_db
-	run_arches
+	run_arches || exit $?
 fi
 
 # Else, process arguments
@@ -357,7 +353,7 @@ do
 	case ${key} in
 		run_arches)
 			wait_for_db
-			run_arches
+			run_arches || exit $?
 		;;
 		run_livereload)
 			run_livereload_server

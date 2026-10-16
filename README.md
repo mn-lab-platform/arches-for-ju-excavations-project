@@ -7,9 +7,32 @@ This deployment stack, alongside the core application, was developed as part of 
 Special thanks to the original creators of [**arches-via-docker**](https://github.com/opencontext/arches-via-docker) for the foundational Docker configurations used in this project.
 
 ## Setting Up Arches for JU Excavations on Your Machine
-1. Clone this repository.
+
+### Arches 8.2 and Arches Search upgrade
+
+This deployment uses the Arches 8.2 pre-release and Arches Search. The image builds
+the excavation application from the adjacent
+`../arches-for-excavation-application` directory, so keep both repositories
+next to each other as shown in the Docker Compose configuration.
+
+Before starting an existing 8.0 database with this image, back up the PostgreSQL
+database and uploaded files. Then, from this repository, run:
+
+```bash
+docker compose build arches
+docker compose up -d
+docker compose logs -f arches
+```
+
+The startup script runs Django migrations and builds the frontend. Check the
+container logs for migration or build errors, then verify the Search page and
+the existing excavation workflows. Arches Search is still a pre-release; review
+its configuration and behavior before using this image in production.
+
+1. Clone both repositories into the same parent directory.
     ```bash
     git clone https://github.com/mn-lab-platform/arches-for-ju-excavations-project.git
+    git clone https://github.com/mn-lab-platform/arches-for-ju-excavations.git
     ```
 2. Create an .env file in the root of the cloned codebase, by copying the `edit_dot_env` file: 
     ``` bash
@@ -150,5 +173,10 @@ Restore script modes:
 
     - *`footer_additional_text`*: Fine print, addresses, or contact details in the footer. Wrap in mark_safe() to support HTML entities like "&middot;".
 
+<<<<<<< Updated upstream
     - *`email_header_image_url`*: Path to the icon that should be placed in the email header.
     - *`email_footer_image_url`*: Path to the icon that should be placed in the email footer.
+=======
+    - *email_header_image_url*: Path to the icon that should be placed in the email header.
+    - *email_footer_image_url*: Path to the icon that should be placed in the email footer.
+>>>>>>> Stashed changes
