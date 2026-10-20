@@ -88,6 +88,8 @@ services:
     environment:
       - DEBUG="${DJANGO_DEBUG}"
       - ARCHES_PROJECT=${ARCHES_PROJECT}
+      - VERIFY_DB_USER=verify_reader
+      - VERIFY_DB_PASSWORD=${VERIFY_DB_PASSWORD:-}
     stdin_open: true
     tty: true
     ports:
@@ -106,7 +108,34 @@ services:
       - arches-static:/static_root
       - uploads:/arches_app/${ARCHES_PROJECT}/${ARCHES_PROJECT}/uploadedfiles
       - ../arches_data/:/arches_data
-      # - ../arches-for-ju-excavations/arches_for_excavation:/opt/venv/lib/python3.13/site-packages/arches_for_excavation
+      - ../arches-for-excavation-application/arches_for_excavation:/opt/venv/lib/python3.13/site-packages/arches_for_excavation
+    networks:
+      - arches_for_excavation_net
+
+
+  verify:
+    image: arches-verify:latest
+    build:
+      context: ../verify-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      VERIFY_DB_HOST: ${PGHOST}
+      VERIFY_DB_PORT: ${PGPORT}
+      VERIFY_DB_NAME: ${PGDBNAME}
+      VERIFY_DB_USER: verify_reader
+      VERIFY_DB_PASSWORD: ${VERIFY_DB_PASSWORD:?Set VERIFY_DB_PASSWORD in .env}
+      VERIFY_REDIS_URL: redis://arches_redis:6379/2
+    depends_on:
+      arches:
+        condition: service_started
+      arches_redis:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     networks:
       - arches_for_excavation_net
 
@@ -122,6 +151,7 @@ services:
       - uploads:/media_root/uploadedfiles:ro                        
     depends_on:
       - arches
+      - verify
     networks:
       - arches_for_excavation_net
 
