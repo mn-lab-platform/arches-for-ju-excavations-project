@@ -38,7 +38,7 @@ sh: 1: eslint: not found
 - docker exec -it arches npm install
 
 Unable to save. NotFoundError(404, "{'_index': 'arches_for_excavation_concepts', '_id': 'ac41d9be-79db-4256-b368-2f4559cfbe55', 'found': False}")
-- docker exec -it arches python manage.py es index_concepts
+- docker exec -it arches python manage.py es reindex_database
 
 Problems with displaying resources geometry in search map
 -sudo docker compose exec arches bash
@@ -48,3 +48,6 @@ from django.db import connection
 with connection.cursor() as cursor:
     cursor.execute("SELECT refresh_geojson_geometries();")
     print(cursor.fetchone())
+
+
+docker exec arches python manage.py report_configs generate

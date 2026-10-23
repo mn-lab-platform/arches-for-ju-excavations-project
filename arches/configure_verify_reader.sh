@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script is deliberately idempotent: it runs at every Arches start and
-# keeps the reporting account restricted to the five tables it needs.
+# keeps the reporting account restricted to the six tables it needs.
 set -euo pipefail
 
 VERIFY_DB_USER="${VERIFY_DB_USER:-verify_reader}"
@@ -41,5 +41,5 @@ SELECT format('GRANT CONNECT ON DATABASE %I TO %I', current_database(), :'verify
 SELECT format('REVOKE ALL ON SCHEMA public FROM %I', :'verify_user') \gexec
 SELECT format('GRANT USAGE ON SCHEMA public TO %I', :'verify_user') \gexec
 SELECT format('REVOKE ALL ON ALL TABLES IN SCHEMA public FROM %I', :'verify_user') \gexec
-SELECT format('GRANT SELECT ON graphs, nodes, edges, resource_instances, tiles TO %I', :'verify_user') \gexec
+SELECT format('GRANT SELECT ON graphs, nodes, edges, resource_instances, tiles, geojson_geometries TO %I', :'verify_user') \gexec
 SQL
