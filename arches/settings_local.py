@@ -33,6 +33,7 @@ RASTER_DATA_DIR = os.path.join(
     UPLOADED_FILES_DIR,
     "iiif_raster",
 )
+IIIF_TUS_RESULTS_DIR = "/arches_data/iiif_tus_results"
 
 TITILER_DATA_MOUNT = "/data"
 
@@ -233,3 +234,16 @@ LANDING_IMAGE_SLIDES_CONFIG = [
         "image_attribution": "Main Square, Kraków. Photo by Swifteye"
     }
 ]
+
+EXTERNAL_OAUTH_CONFIGURATION = {
+    "default_user_groups": ["Resource Editor", "Plugin Access"],
+    "user_domains": ["gmail.com", "uj.edu.pl", "pw.edu.pl", "pwr.edu.pl"],
+    "uid_claim": "preferred_username",
+    "app_id": "afJUe-dev",
+    "app_secret": get_optional_env_variable("KEYCLOAK_SECRET"),
+    "scopes": ["openid", "profile", "email"],
+    "authorization_endpoint": "https://login.mn.cenagis.edu.pl/realms/marenostrum/protocol/openid-connect/auth",
+    "token_endpoint": "https://login.mn.cenagis.edu.pl/realms/marenostrum/protocol/openid-connect/token",
+    "jwks_uri": "https://login.mn.cenagis.edu.pl/realms/marenostrum/protocol/openid-connect/certs",
+    "validate_id_token": True
+}

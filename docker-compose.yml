@@ -207,7 +207,8 @@ services:
     command:
       - "-upload-dir=/data"
       - "-port=1080"
-      - "-cors-allow-origin=${DEPLOY_HOST}"
+      - "-base-path=/tus/"
+      - "-cors-allow-origin=https://${DEPLOY_HOST}"
       - "-behind-proxy"
       - "-disable-download"
       - "-hooks-http=http://arches:8000/api/webhooks/tusd"
