@@ -198,8 +198,6 @@ services:
     env_file:
       - ./.env
     restart: unless-stopped
-    ports:
-      - "1080:1080"
     volumes:
       - uploads:/data
     networks:
