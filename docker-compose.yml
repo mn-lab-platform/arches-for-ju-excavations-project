@@ -165,8 +165,6 @@ services:
     env_file:
       - ./.env
     restart: unless-stopped
-    ports:
-      - "1080:1080"
     volumes:
       - uploads:/data
     networks:
@@ -174,6 +172,7 @@ services:
     command:
       - "-upload-dir=/data"
       - "-port=1080"
+      - "-base-path=/tus/files/"
       - "-cors-allow-origin=${DEPLOY_HOST}"
       - "-behind-proxy"
       - "-disable-download"
