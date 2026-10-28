@@ -123,6 +123,9 @@ services:
       VERIFY_DB_USER: verify_reader
       VERIFY_DB_PASSWORD: ${VERIFY_DB_PASSWORD:?Set VERIFY_DB_PASSWORD in .env}
       VERIFY_REDIS_URL: redis://arches_redis:6379/2
+      VERIFY_RULES_PATH: /data/custom_rules.json
+    volumes:
+      - verify-data:/data
     depends_on:
       arches:
         condition: service_started
@@ -228,3 +231,4 @@ volumes:
   arches-static:
   arches-app:
   uploads:
+  verify-data:
