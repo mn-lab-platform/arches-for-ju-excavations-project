@@ -328,13 +328,20 @@ run_setup_shared_volumes() {
 	chmod -R g+s ${UPLOAD_DIR}
 
 	echo "Shared volume permissions configured for ${UPLOAD_DIR}"
+}
 
+configure_verify_reader() {
+	echo ""
+	echo "----- CONFIGURING VERIFY READER -----"
+	echo ""
+	"${APP_FOLDER}/configure_verify_reader.sh"
 	echo "---------------------------------------------------------------"
 }
 
 #### Main commands
 run_arches() {
 	init_arches
+	configure_verify_reader
 	run_elastic_safe_migrations
 	run_createcachetable
 	start_celery_supervisor
