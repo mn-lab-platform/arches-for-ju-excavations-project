@@ -334,7 +334,7 @@ configure_verify_reader() {
 	echo ""
 	echo "----- CONFIGURING VERIFY READER -----"
 	echo ""
-	"${APP_FOLDER}/configure_verify_reader.sh"
+	bash "${APP_FOLDER}/configure_verify_reader.sh"
 	echo "---------------------------------------------------------------"
 }
 

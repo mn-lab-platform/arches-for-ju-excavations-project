@@ -101,6 +101,7 @@ services:
     command:
       - run_arches
     volumes:
+      - ./arches/configure_verify_reader.sh:${APP_ROOT}/configure_verify_reader.sh:ro
       - arches-log:/web_root/logs
       - arches-static:/static_root
       - uploads:/arches_app/${ARCHES_PROJECT}/${ARCHES_PROJECT}/uploadedfiles
@@ -198,6 +199,8 @@ services:
     env_file:
       - ./.env
     restart: unless-stopped
+    ports:
+      - "1080:1080"
     volumes:
       - uploads:/data
     networks:
@@ -205,7 +208,7 @@ services:
     command:
       - "-upload-dir=/data"
       - "-port=1080"
-      - "-base-path=/tus/files/"
+      - "-base-path=/tus/files/"      
       - "-cors-allow-origin=${DEPLOY_HOST}"
       - "-behind-proxy"
       - "-disable-download"

@@ -361,6 +361,7 @@ module.exports = () => {
                     ...templateFilepathLookup,
                     ...imageFilepathLookup,
                     ...nodeModulesAliases,
+                    'd3': Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'd3', 'dist', 'd3.mjs'),
                     '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')],
                     'node_modules': Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH),
                     
