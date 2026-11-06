@@ -195,3 +195,27 @@ EXTERNAL_OAUTH_CONFIGURATION = {
     "jwks_uri": "https://login.mn.cenagis.edu.pl/realms/marenostrum/protocol/openid-connect/certs",
     "validate_id_token": True
 }
+
+RESOURCE_GRAPH_IDS = {
+    "annotation": "d1894fdd-41b3-44d3-aebb-ab44999f881e",
+    "context": "2c536779-d3e6-43ef-bc0c-cd4d97dc8c6c",
+    "coordinate_system": "855343ec-9d7c-4947-970c-e80b6cfacc4f",
+    "digital_resource_3d": "039f5a45-82e2-4597-8609-d24c758bfd59",
+    "digital_resource_iiif": "f1b9e37a-c3ba-4c26-a797-7f16302c031c",
+    "special_find": "ac939663-80ce-43df-967d-42def45ef333",
+    "trench": "cc91f1ff-6ea8-422c-be14-b818660f66f8",
+}
+
+resource_viewer_group_id = (get_optional_env_variable("RESOURCE_VIEWER_GROUP_ID") or "").strip()
+if resource_viewer_group_id:
+    PERMISSION_FRAMEWORK = "arches_default_deny.ArchesDefaultDenyPermissionFramework"
+    PERMISSION_DEFAULTS = {
+        graph_id: [
+            {
+                "id": int(resource_viewer_group_id),
+                "type": "group",
+                "permissions": ["view_resourceinstance"],
+            }
+        ]
+        for graph_id in RESOURCE_GRAPH_IDS.values()
+    }
