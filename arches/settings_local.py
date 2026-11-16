@@ -183,18 +183,20 @@ LANDING_IMAGE_SLIDES_CONFIG = [
     }
 ]
 
-EXTERNAL_OAUTH_CONFIGURATION = {
-    "default_user_groups": ["Resource Editor", "Plugin Access"],
-    "user_domains": ["gmail.com", "uj.edu.pl", "pw.edu.pl", "pwr.edu.pl"],
-    "uid_claim": "preferred_username",
-    "app_id": "afJUe-dev",
-    "app_secret": get_optional_env_variable("KEYCLOAK_SECRET"),
-    "scopes": ["openid", "profile", "email"],
-    "authorization_endpoint": "https://login.mn.cenagis.edu.pl/realms/marenostrum/protocol/openid-connect/auth",
-    "token_endpoint": "https://login.mn.cenagis.edu.pl/realms/marenostrum/protocol/openid-connect/token",
-    "jwks_uri": "https://login.mn.cenagis.edu.pl/realms/marenostrum/protocol/openid-connect/certs",
-    "validate_id_token": True
-}
+enable_external_oauth = get_optional_env_variable("ENABLE_EXTERNAL_OAUTH") or "false"
+enable_external_oauth = enable_external_oauth.lower() in ['true', '1', 't']
+
+if enable_external_oauth:
+    EXTERNAL_OAUTH_CONFIGURATION = {
+        "default_user_groups": ["<DEFAULT_USER_GROUPS>"],
+        "user_domains": ["<USER_DOMAINS>"],
+        "uid_claim": "preferred_username",
+        "app_id": "<APP_ID>",
+        "app_secret": get_optional_env_variable("EXTERNAL_OAUTH_SECRET"),
+        "scopes": ["openid", "profile", "email"],
+        "validate_id_token": True,
+        "oidc_discovery_url": "<OIDC_DISCOVERY_URL>",
+    }
 
 RESOURCE_GRAPH_IDS = {
     "annotation": "d1894fdd-41b3-44d3-aebb-ab44999f881e",
@@ -206,16 +208,22 @@ RESOURCE_GRAPH_IDS = {
     "trench": "cc91f1ff-6ea8-422c-be14-b818660f66f8",
 }
 
-resource_viewer_group_id = (get_optional_env_variable("RESOURCE_VIEWER_GROUP_ID") or "").strip()
-if resource_viewer_group_id:
-    PERMISSION_FRAMEWORK = "arches_default_deny.ArchesDefaultDenyPermissionFramework"
-    PERMISSION_DEFAULTS = {
-        graph_id: [
-            {
-                "id": int(resource_viewer_group_id),
-                "type": "group",
-                "permissions": ["view_resourceinstance"],
-            }
-        ]
-        for graph_id in RESOURCE_GRAPH_IDS.values()
-    }
+resource_viewer_group_id = 13
+resource_editor_group_id = 2
+
+PERMISSION_FRAMEWORK = "arches_default_deny.ArchesDefaultDenyPermissionFramework"
+PERMISSION_DEFAULTS = {
+    graph_id: [
+        {
+            "id": resource_viewer_group_id,
+            "type": "group",
+            "permissions": ["view_resourceinstance"],
+        },
+        {
+            "id": resource_editor_group_id,
+            "type": "group",
+            "permissions": ["change_resourceinstance", "delete_resourceinstance"],
+        }
+    ]
+    for graph_id in RESOURCE_GRAPH_IDS.values()
+}
