@@ -222,7 +222,7 @@ PERMISSION_DEFAULTS = {
         {
             "id": resource_editor_group_id,
             "type": "group",
-            "permissions": ["change_resourceinstance", "delete_resourceinstance"],
+            "permissions": ["view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"],
         }
     ]
     for graph_id in RESOURCE_GRAPH_IDS.values()
