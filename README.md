@@ -66,29 +66,18 @@ Special thanks to the original creators of [**arches-via-docker**](https://githu
     ```
 ## Resource Instance Visibility
 
-Arches currently uses a *Default Allow* strategy for resource visibility. This means that resource instances are visible unless access is restricted. To provide a more restrictive default, this project supports Arches' *Default Deny* permission framework. It hides resource instances from regular users and allows access to be granted explicitly to selected users or groups.
+At the time this configuration was implemented, Arches versions before 8.2.0 used a *Default Allow* strategy for resource visibility. Under this strategy, resource instances are visible unless access is explicitly restricted.
+
+This project supports Arches' *Default Deny* permission framework, which provides a more restrictive default: resource instances are hidden from regular users unless access is explicitly granted to specific users or groups.
 
 ### Granting a group access
 
-To grant a group access to the configured resource models, set its numeric ID in the `.env` file:
+The current configuration grants permissions to two groups:
+- *`Resource Viewer` (group ID: 13)* — a custom group created for SSO configuration. It is granted the `view_resourceinstance` permission.
+- *`Resource Editor` (group ID: 2)* — an Arches core group. It is granted the `change_resourceinstance` and `delete_resourceinstance` permissions.
 
-```bash
-RESOURCE_VIEWER_GROUP_ID=2
-```
-
-You can find the group ID in the Django admin URL when editing the group:
-
-```text
-<your-domain>/admin/auth/group/<group-id>/change/
-```
-
-For example, `/admin/auth/group/2/change/` indicates group ID `2`.
-
-Leaving *`RESOURCE_VIEWER_GROUP_ID`* empty will result in Arches using the **Default Allow** configuration (current Arches core default option).
-
-When enabled, the project assigns the `view_resourceinstance` permission to the configured group for every graph ID in `RESOURCE_GRAPH_IDS`. To include additional resource models, add their graph IDs to this dictionary in [`arches/settings_local.py`](arches/settings_local.py):
-
-```bash
+These permissions are assigned for the resource graphs listed in `RESOURCE_GRAPH_IDS` in [`settings_local.py`](arches/settings_local.py):
+```python
 RESOURCE_GRAPH_IDS = {
     "annotation": "d1894fdd-41b3-44d3-aebb-ab44999f881e",
     "context": "2c536779-d3e6-43ef-bc0c-cd4d97dc8c6c",
@@ -100,20 +89,24 @@ RESOURCE_GRAPH_IDS = {
 }
 ```
 
-The dictionary uses descriptive slugs as keys and graph IDs as values.
+The dictionary keys are descriptive slugs, and the values are resource graph IDs. Add or remove entries to customize which resource graphs are managed by this permission configuration.
 
 Because [`settings_local.py`](arches/settings_local.py) is copied into the image during the Docker build, rebuild the `arches` container after changing it:
 
 ```bash
-# Restart Nginx as well so it serves the newly built frontend assets.
-docker compose up --build -d arches && docker compose restart nginx
+docker compose up --build -d arches
 ```
 
-Alternatively, copy the updated file into the running container manually. Rebuilding the container is recommended because manual changes are lost when the container is recreated.
+If necessary, restart Nginx separately so it serves the current frontend assets:
+
+```bash
+docker compose restart nginx
+```
 
 ### Applying permission changes
 
-After changing `RESOURCE_VIEWER_GROUP_ID`, `RESOURCE_GRAPH_IDS`, `PERMISSION_FRAMEWORK`, or `PERMISSION_DEFAULTS`, you will need to rebuild the Elasticsearch index for the permissions to apply:
+After changing `RESOURCE_VIEWER_GROUP_ID`, `RESOURCE_GRAPH_IDS`, `PERMISSION_FRAMEWORK`, or `PERMISSION_DEFAULTS`, rebuild the Elasticsearch index:
+
 ```bash
 docker exec -it arches python manage.py es reindex_database
 ```
@@ -155,6 +148,50 @@ Restore script modes:
 - *`all`*: Restores both PostgreSQL database and all uploaded media files.
 - *`db`*: Restores only the PostgreSQL database. Useful for quick rollbacks if only application data was corrupted.
 - *`media`*: Restores only the uploaded files directory.
+
+
+## Configuring an External OAuth Provider
+
+For more information, refer to the [Arches external OAuth documentation](https://arches.readthedocs.io/en/stable/configuring/settings-beyond-the-ui/#using-single-sign-on-with-an-external-oauth-provider). To configure an external OAuth provider, such as Keycloak, edit the `.env` file and [`arches/settings_local.py`](arches/settings_local.py).
+
+1. Enable external OAuth and set the client secret in `.env`:
+
+    ```bash
+    ENABLE_EXTERNAL_OAUTH=True
+    EXTERNAL_OAUTH_SECRET=your-client-secret
+    ```
+
+    `EXTERNAL_OAUTH_SECRET` should contain the client secret issued by your identity provider. Do not commit the secret to the repository.
+
+2. Replace the placeholders in `EXTERNAL_OAUTH_CONFIGURATION` in [`arches/settings_local.py`](arches/settings_local.py):
+
+    ```python
+    EXTERNAL_OAUTH_CONFIGURATION = {
+        "default_user_groups": [<DEFAULT_USER_GROUPS>],
+        "user_domains": [<USER_DOMAINS>],
+        "uid_claim": "preferred_username",
+        "app_id": <APP_ID>,
+        "app_secret": get_optional_env_variable("EXTERNAL_OAUTH_SECRET"),
+        "scopes": ["openid", "profile", "email"],
+        "validate_id_token": True,
+        "oidc_discovery_url": <OIDC_DISCOVERY_URL>,
+    }
+    ```
+
+    Replace each placeholder with a value appropriate for your identity provider:
+
+    - `<DEFAULT_USER_GROUPS>`: A comma-separated list of Arches group names to assign to newly created users.
+    - `<USER_DOMAINS>`: A comma-separated list of permitted email domains, without the `@` symbol.
+    - `<APP_ID>`: The OAuth client ID issued by your identity provider. Quote it if it is not a numeric value.
+    - `<OIDC_DISCOVERY_URL>`: The OpenID Connect discovery URL published by your identity provider.
+
+3. Rebuild the `arches` container so the updated settings are copied into the image:
+
+    ```bash
+    docker compose up --build -d arches
+    ```
+
+After restarting, users can sign in through the external OAuth provider.
 
 ## Customizing Your Arches for JU Excavations
 1. Change the `.env` variables essential for this section:
