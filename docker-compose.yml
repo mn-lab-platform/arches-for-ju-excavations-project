@@ -113,8 +113,9 @@ services:
 
   verify:
     image: arches-verify:latest
+    pull_policy: build
     build:
-      context: ../verify-service
+      context: "https://github.com/mn-lab-platform/arches-verification-module.git#main"
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:
