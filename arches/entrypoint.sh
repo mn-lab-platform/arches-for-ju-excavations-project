@@ -338,6 +338,15 @@ configure_verify_reader() {
 	echo "---------------------------------------------------------------"
 }
 
+run_register_pottery_icons() {
+	echo ""
+	echo "----- REGISTERING CUSTOM POTTERY ICONS -----"
+	echo ""
+	cd ${APP_FOLDER}
+	python3 manage.py register_pottery_icons
+	echo "---------------------------------------------------------------"
+}
+
 #### Main commands
 run_arches() {
 	init_arches
@@ -349,6 +358,7 @@ run_arches() {
 	run_setup_admin_password
 	run_create_custom_auth_groups
 	run_setup_mn_thesaurus_provider
+	run_register_pottery_icons
 	run_setup_shared_volumes
 	run_django_server
 }
@@ -415,6 +425,10 @@ do
 		run_setup_mn_thesaurus_provider)
 			wait_for_db
 			run_setup_mn_thesaurus_provider
+		;;
+		run_register_pottery_icons)
+			wait_for_db
+			run_register_pottery_icons
 		;;
 		setup_arches)
 			start_celery_supervisor
