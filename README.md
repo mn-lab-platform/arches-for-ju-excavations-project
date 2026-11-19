@@ -128,7 +128,7 @@ To take advantage of the Backup Daemon you need to perform the following steps:
     docker exec -it arches_backup_daemon restic init
     ```
 
-And just like that Backup Daemon is ready to back up and restore data from your Arches for JU Excavations instance. To back up your data, execute the [`backup.sh`](backup_daemon/backup.sh) script:
+And just like that, Backup Daemon is ready to back up and restore data from your Arches for JU Excavations instance. The backup script runs every day at 2:30 AM - feel free to change this schedule in [backup_daemon/crontab](backup_daemon\crontab) if needed. **Keep in mind that you need to reserve additional disk space for the backup data**. Thanks to the robustness of Restic, the required space is minimized - an additional disk volume roughly the size of your current data should be sufficient. To trigger a manual backup, run the [`backup.sh`](backup_daemon/backup.sh) script:
 ```bash
     docker exec -it arches_backup_daemon ./backup.sh
 ```
